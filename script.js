@@ -212,8 +212,15 @@ class TaskListApp {
                     ` : ''}
                     <div class="task-title">${this.escapeHtml(task.text)}</div>
                 </div>
-                <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
-                     data-task-id="${task.id}"></div>
+                <div class="task-actions">
+                    <button class="delete-task-btn" data-task-id="${task.id}" title="Delete task">
+                        <svg viewBox="0 0 16 16" width="14" height="14">
+                            <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.585 15h-5.17a1.748 1.748 0 0 1-1.751-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15zM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25z"/>
+                        </svg>
+                    </button>
+                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                         data-task-id="${task.id}"></div>
+                </div>
             </div>
         `;
     }
@@ -242,6 +249,11 @@ class TaskListApp {
             checkbox.addEventListener('click', this.handleCheckboxClick.bind(this));
         });
 
+        // Delete button events
+        document.querySelectorAll('.delete-task-btn').forEach(deleteBtn => {
+            deleteBtn.addEventListener('click', this.handleDeleteClick.bind(this));
+        });
+
         // Bottom drop zone events
         const dropZone = document.getElementById('drop-zone-bottom');
         if (dropZone) {
@@ -266,6 +278,16 @@ class TaskListApp {
         e.stopPropagation();
         const taskId = e.target.dataset.taskId;
         this.toggleTask(taskId);
+    }
+
+    handleDeleteClick(e) {
+        e.stopPropagation();
+        const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
+        
+        // Show confirmation before deleting
+        if (confirm('Are you sure you want to delete this task?')) {
+            this.deleteTask(taskId);
+        }
     }
 
     // Drag and Drop Implementation
