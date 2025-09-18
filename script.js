@@ -8,6 +8,7 @@ class TaskListApp {
         this.draggedElement = null;
         this.touchStartY = 0;
         this.touchStartX = 0;
+        this.touchStartTime = 0;
         this.isDragging = false;
         
         this.init();
@@ -131,10 +132,21 @@ class TaskListApp {
     }
 
     moveTask(fromIndex, toIndex) {
-        if (fromIndex !== toIndex && fromIndex >= 0 && toIndex >= 0 && 
-            fromIndex < this.tasks.length && toIndex < this.tasks.length) {
+        if (fromIndex !== toIndex && fromIndex >= 0 && fromIndex < this.tasks.length) {
+            // Adjust toIndex to be within valid bounds
+            toIndex = Math.max(0, Math.min(toIndex, this.tasks.length));
+            
+            // Remove the task from its current position
             const task = this.tasks.splice(fromIndex, 1)[0];
+            
+            // Adjust insertion index if moving down
+            if (toIndex > fromIndex) {
+                toIndex = toIndex - 1;
+            }
+            
+            // Insert at the new position
             this.tasks.splice(toIndex, 0, task);
+            
             this.saveTasksToStorage();
             this.renderTasks();
         }
@@ -186,7 +198,7 @@ class TaskListApp {
                  data-task-id="${task.id}" 
                  data-index="${index}"
                  draggable="true">
-                <div class="drag-handle" title="Drag to reorder">
+                <div class="drag-handle" title="Drag to reorder" draggable="true">
                     <svg viewBox="0 0 16 16" width="16" height="16">
                         <path d="M10 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
                     </svg>
@@ -211,16 +223,18 @@ class TaskListApp {
         document.querySelectorAll('.task-item').forEach(item => {
             item.addEventListener('click', this.handleTaskClick.bind(this));
             
-            // Drag and drop events
+            // Drag and drop events - only for desktop
             item.addEventListener('dragstart', this.handleDragStart.bind(this));
             item.addEventListener('dragend', this.handleDragEnd.bind(this));
             item.addEventListener('dragover', this.handleDragOver.bind(this));
+            item.addEventListener('dragenter', this.handleDragEnter.bind(this));
+            item.addEventListener('dragleave', this.handleDragLeave.bind(this));
             item.addEventListener('drop', this.handleDrop.bind(this));
             
             // Touch events for mobile drag and drop
-            item.addEventListener('touchstart', this.handleTouchStart.bind(this));
-            item.addEventListener('touchmove', this.handleTouchMove.bind(this));
-            item.addEventListener('touchend', this.handleTouchEnd.bind(this));
+            item.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+            item.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+            item.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
         });
 
         // Checkbox events
@@ -230,8 +244,9 @@ class TaskListApp {
     }
 
     handleTaskClick(e) {
-        if (e.target.closest('.task-checkbox') || e.target.closest('.drag-handle')) {
-            return; // Don't toggle when clicking checkbox or drag handle
+        // Don't toggle when clicking checkbox or if we just finished dragging
+        if (e.target.closest('.task-checkbox') || this.draggedElement) {
+            return;
         }
         
         const taskId = e.currentTarget.dataset.taskId;
@@ -246,60 +261,116 @@ class TaskListApp {
 
     // Drag and Drop Implementation
     handleDragStart(e) {
+        // Prevent dragging if started from checkbox or input elements
+        if (e.target.closest('.task-checkbox') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            e.preventDefault();
+            return false;
+        }
+        
         this.draggedElement = e.currentTarget;
         e.currentTarget.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
+        
+        // Set drag image to be the whole task item
+        const rect = e.currentTarget.getBoundingClientRect();
+        e.dataTransfer.setDragImage(e.currentTarget, rect.width / 2, rect.height / 2);
     }
 
     handleDragEnd(e) {
         e.currentTarget.classList.remove('dragging');
         document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('drag-over');
+            item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
         });
         this.draggedElement = null;
     }
 
+    handleDragEnter(e) {
+        e.preventDefault();
+    }
+
+    handleDragLeave(e) {
+        // Only remove drag-over if we're actually leaving the element
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+    }
+
     handleDragOver(e) {
+        if (!this.draggedElement) return;
+        
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         
-        if (e.currentTarget !== this.draggedElement) {
-            e.currentTarget.classList.add('drag-over');
+        // Remove all previous drag indicators
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
+        });
+        
+        const targetItem = e.currentTarget;
+        if (targetItem !== this.draggedElement) {
+            const rect = targetItem.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            const mouseY = e.clientY;
+            
+            // Determine if we should show drop line above or below
+            if (mouseY < midpoint) {
+                targetItem.classList.add('drop-line-above');
+            } else {
+                targetItem.classList.add('drop-line-below');
+            }
         }
     }
 
     handleDrop(e) {
         e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
         
         if (this.draggedElement && e.currentTarget !== this.draggedElement) {
             const fromIndex = parseInt(this.draggedElement.dataset.index);
-            const toIndex = parseInt(e.currentTarget.dataset.index);
-            this.moveTask(fromIndex, toIndex);
+            let toIndex = parseInt(e.currentTarget.dataset.index);
+            
+            // Adjust insertion index based on drop line position
+            if (e.currentTarget.classList.contains('drop-line-below')) {
+                toIndex = toIndex + 1;
+            }
+            
+            if (!isNaN(fromIndex) && !isNaN(toIndex)) {
+                this.moveTask(fromIndex, toIndex);
+            }
         }
+        
+        // Clean up all drag indicators
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
+        });
     }
 
     // Touch Events for Mobile Drag and Drop
     handleTouchStart(e) {
-        if (e.target.closest('.drag-handle')) {
-            const touch = e.touches[0];
-            this.touchStartY = touch.clientY;
-            this.touchStartX = touch.clientX;
-            this.draggedElement = e.currentTarget;
-            this.isDragging = false;
+        // Don't start drag if touching checkbox
+        if (e.target.closest('.task-checkbox')) {
+            return;
         }
+        
+        const touch = e.touches[0];
+        this.touchStartY = touch.clientY;
+        this.touchStartX = touch.clientX;
+        this.draggedElement = e.currentTarget;
+        this.isDragging = false;
+        this.touchStartTime = Date.now();
     }
 
     handleTouchMove(e) {
         if (!this.draggedElement) return;
         
-        e.preventDefault();
         const touch = e.touches[0];
         const deltaY = Math.abs(touch.clientY - this.touchStartY);
         const deltaX = Math.abs(touch.clientX - this.touchStartX);
+        const timeDelta = Date.now() - this.touchStartTime;
         
-        if (deltaY > 10 || deltaX > 10) {
+        // Require minimum movement and time delay to start dragging
+        if ((deltaY > 15 || deltaX > 15) && timeDelta > 150) {
+            e.preventDefault(); // Prevent scrolling
             this.isDragging = true;
             this.draggedElement.classList.add('dragging');
             
@@ -307,14 +378,23 @@ class TaskListApp {
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             const taskItemBelow = elementBelow?.closest('.task-item');
             
-            // Remove previous drag-over states
+            // Remove previous drag indicators
             document.querySelectorAll('.task-item').forEach(item => {
-                item.classList.remove('drag-over');
+                item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
             });
             
-            // Add drag-over to current target
+            // Add drop line indicator to current target
             if (taskItemBelow && taskItemBelow !== this.draggedElement) {
-                taskItemBelow.classList.add('drag-over');
+                const rect = taskItemBelow.getBoundingClientRect();
+                const midpoint = rect.top + rect.height / 2;
+                const touchY = touch.clientY;
+                
+                // Determine if we should show drop line above or below
+                if (touchY < midpoint) {
+                    taskItemBelow.classList.add('drop-line-above');
+                } else {
+                    taskItemBelow.classList.add('drop-line-below');
+                }
             }
         }
     }
@@ -329,14 +409,34 @@ class TaskListApp {
             
             if (taskItemBelow && taskItemBelow !== this.draggedElement) {
                 const fromIndex = parseInt(this.draggedElement.dataset.index);
-                const toIndex = parseInt(taskItemBelow.dataset.index);
+                let toIndex = parseInt(taskItemBelow.dataset.index);
+                
+                // Adjust insertion index based on drop line position
+                if (taskItemBelow.classList.contains('drop-line-below')) {
+                    toIndex = toIndex + 1;
+                }
+                
                 this.moveTask(fromIndex, toIndex);
+            }
+        } else {
+            // This was a tap, not a drag - handle task toggle
+            const timeDelta = Date.now() - this.touchStartTime;
+            const touch = e.changedTouches[0];
+            const deltaY = Math.abs(touch.clientY - this.touchStartY);
+            const deltaX = Math.abs(touch.clientX - this.touchStartX);
+            
+            // If it was a short tap with minimal movement, toggle the task
+            if (timeDelta < 300 && deltaY < 10 && deltaX < 10) {
+                const taskId = this.draggedElement.dataset.taskId;
+                if (!e.target.closest('.task-checkbox')) {
+                    this.toggleTask(taskId);
+                }
             }
         }
         
         // Cleanup
         document.querySelectorAll('.task-item').forEach(item => {
-            item.classList.remove('dragging', 'drag-over');
+            item.classList.remove('dragging', 'drag-over', 'drop-line-above', 'drop-line-below');
         });
         
         this.draggedElement = null;

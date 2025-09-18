@@ -308,7 +308,7 @@ input, textarea, .task-title {
     border: 1px solid var(--color-border-default);
     border-radius: var(--border-radius);
     padding: var(--space-4);
-    cursor: pointer;
+    cursor: grab;
     transition: all var(--transition-fast);
     position: relative;
     display: flex;
@@ -316,6 +316,15 @@ input, textarea, .task-title {
     gap: var(--space-3);
     min-height: 60px;
     user-select: none;
+}
+
+.task-item:hover {
+    border-color: var(--color-border-muted);
+    box-shadow: var(--shadow-small);
+}
+
+.task-item:active {
+    cursor: grabbing;
 }
 
 .task-item:hover {
@@ -338,11 +347,41 @@ input, textarea, .task-title {
     transform: rotate(2deg);
     z-index: 1000;
     box-shadow: var(--shadow-large);
+    border: 2px dashed var(--color-accent-emphasis);
 }
 
 .task-item.drag-over {
-    border-color: var(--color-accent-emphasis);
-    background-color: rgba(3, 102, 214, 0.05);
+    border: 2px solid var(--color-accent-emphasis);
+    background-color: rgba(3, 102, 214, 0.1);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+
+/* Drop line indicators */
+.task-item.drop-line-above::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--color-accent-emphasis);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(3, 102, 214, 0.4);
+    z-index: 1001;
+}
+
+.task-item.drop-line-below::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--color-accent-emphasis);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(3, 102, 214, 0.4);
+    z-index: 1001;
 }
 
 /* Drag Handle - Now at the front */
@@ -357,6 +396,9 @@ input, textarea, .task-title {
     align-items: center;
     justify-content: center;
     opacity: 0.7;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 .drag-handle:hover {
@@ -365,12 +407,15 @@ input, textarea, .task-title {
     opacity: 1;
 }
 
-.drag-handle:active {
+.drag-handle:active,
+.task-item.dragging .drag-handle {
     cursor: grabbing;
+    opacity: 1;
 }
 
 .drag-handle svg {
     fill: currentColor;
+    pointer-events: none;
 }
 
 /* Task Content - Expanded to take available space */
@@ -380,12 +425,14 @@ input, textarea, .task-title {
     flex-direction: column;
     gap: var(--space-1);
     min-width: 0; /* Allow content to shrink */
+    pointer-events: none; /* Allow drag events to pass through */
 }
 
 .task-title {
     font-weight: 500;
     color: var(--color-fg-default);
     word-wrap: break-word;
+    pointer-events: none;
 }
 
 .task-header {
@@ -394,6 +441,7 @@ input, textarea, .task-title {
     gap: var(--space-2);
     margin-bottom: var(--space-1);
     flex-wrap: wrap;
+    pointer-events: none;
 }
 
 .task-meta {
@@ -402,6 +450,7 @@ input, textarea, .task-title {
     display: flex;
     gap: var(--space-2);
     flex-wrap: wrap;
+    pointer-events: none;
 }
 
 .task-points {
@@ -411,6 +460,7 @@ input, textarea, .task-title {
     padding: 2px var(--space-2);
     border-radius: 12px;
     font-size: var(--font-size-small);
+    pointer-events: none;
 }
 
 .task-points.completed {
@@ -427,6 +477,7 @@ input, textarea, .task-title {
     font-size: var(--font-size-small);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    pointer-events: none;
 }
 
 /* Task Checkbox - Now at the end */
