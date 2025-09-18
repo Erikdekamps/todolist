@@ -3,58 +3,48 @@
         "id": "sample1",
         "text": "Review project requirements",
         "completed": false,
-        "points": 8,
-        "createdAt": "2025-09-18T10:00:00.000Z"
+        "points": 8
     },
     {
         "id": "sample2",
         "text": "Design user interface mockups",
         "completed": true,
-        "points": 15,
-        "createdAt": "2025-09-18T09:00:00.000Z",
-        "completedAt": "2025-09-18T11:30:00.000Z"
+        "points": 15
     },
     {
         "id": "sample3",
         "text": "Implement task drag and drop functionality",
         "completed": false,
-        "points": 20,
-        "createdAt": "2025-09-18T08:00:00.000Z"
+        "points": 20
     },
     {
         "id": "sample4",
         "text": "Write unit tests for core features",
         "completed": false,
-        "points": 12,
-        "createdAt": "2025-09-18T07:00:00.000Z"
+        "points": 12
     },
     {
         "id": "sample5",
         "text": "Optimize mobile performance",
         "completed": true,
-        "points": 18,
-        "createdAt": "2025-09-18T06:00:00.000Z",
-        "completedAt": "2025-09-18T12:00:00.000Z"
+        "points": 18
     },
     {
         "id": "sample6",
         "text": "Deploy to production server",
         "completed": false,
-        "points": 10,
-        "createdAt": "2025-09-18T05:00:00.000Z"
+        "points": 10
     },
     {
         "id": "sample7",
         "text": "Buy groceries",
         "completed": false,
-        "points": 5,
-        "createdAt": "2025-09-18T04:00:00.000Z"
+        "points": 5
     },
     {
         "id": "sample8",
         "text": "Create comprehensive documentation",
         "completed": false,
-        "points": 16,
-        "createdAt": "2025-09-18T03:00:00.000Z"
+        "points": 16
     }
 ]

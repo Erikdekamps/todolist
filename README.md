@@ -144,9 +144,7 @@ todolist/
     "id": "unique-identifier",
     "text": "Task description",
     "completed": false,
-    "points": 15,
-    "createdAt": "2025-09-18T10:00:00.000Z",
-    "completedAt": null
+    "points": 15
 }
 ```
 

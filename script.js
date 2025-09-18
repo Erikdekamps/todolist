@@ -81,9 +81,7 @@ class TaskListApp {
             id: id || this.generateId(),
             text: text,
             completed: completed,
-            points: points || this.calculateTaskPoints(text),
-            createdAt: new Date().toISOString(),
-            completedAt: completed ? new Date().toISOString() : null
+            points: points || this.calculateTaskPoints(text)
         };
 
         this.tasks.push(task);
@@ -116,7 +114,6 @@ class TaskListApp {
         const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.completed = !task.completed;
-            task.completedAt = task.completed ? new Date().toISOString() : null;
             
             this.saveTasksToStorage();
             this.renderTasks();
@@ -189,9 +186,6 @@ class TaskListApp {
     }
 
     createTaskElement(task, index) {
-        const formattedDate = new Date(task.createdAt).toLocaleDateString();
-        const timeAgo = this.getTimeAgo(task.createdAt);
-        
         return `
             <div class="task-item ${task.completed ? 'completed' : ''}" 
                  data-task-id="${task.id}" 
@@ -206,8 +200,6 @@ class TaskListApp {
                     <div class="task-title">${this.escapeHtml(task.text)}</div>
                     <div class="task-meta">
                         <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
-                        <span>Created ${timeAgo}</span>
-                        ${task.completed ? `<span>Completed ${this.getTimeAgo(task.completedAt)}</span>` : ''}
                     </div>
                 </div>
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
@@ -501,19 +493,6 @@ class TaskListApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    getTimeAgo(dateString) {
-        const now = new Date();
-        const date = new Date(dateString);
-        const diffInSeconds = Math.floor((now - date) / 1000);
-
-        if (diffInSeconds < 60) return 'just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-        
-        return date.toLocaleDateString();
     }
 
     toggleEmptyState(show) {
