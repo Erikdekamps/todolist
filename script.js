@@ -22,19 +22,10 @@ class TaskListApp {
         this.showToast('Welcome to TaskList!', 'info');
     }
 
-    // Migration function to add points to existing tasks
+    // Migration function to add points to existing tasks (disabled - now supporting tasks without points)
     migrateTasks() {
-        let needsSave = false;
-        this.tasks.forEach(task => {
-            if (typeof task.points === 'undefined' || task.points === null) {
-                task.points = this.calculateTaskPoints(task.text);
-                needsSave = true;
-            }
-        });
-        
-        if (needsSave) {
-            this.saveTasksToStorage();
-        }
+        // No longer automatically adding points to tasks without them
+        // Tasks can exist without points
     }
 
     // Event Binding
@@ -84,7 +75,7 @@ class TaskListApp {
             id: id || this.generateId(),
             text: text,
             completed: completed,
-            points: points || this.calculateTaskPoints(text),
+            points: points, // Don't default to calculateTaskPoints if points is explicitly null
             area: area || null
         };
 
@@ -201,16 +192,12 @@ class TaskListApp {
                     </svg>
                 </div>
                 <div class="task-content">
-                    ${task.area ? `
+                    ${task.area || (task.points !== null && task.points !== undefined) ? `
                     <div class="task-header">
-                        <span class="task-area">${this.escapeHtml(task.area)}</span>
-                        <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
+                        ${task.area ? `<span class="task-area">${this.escapeHtml(task.area)}</span>` : ''}
+                        ${(task.points !== null && task.points !== undefined) ? `<span class="task-points ${task.completed ? 'completed' : ''}">${task.points} pts</span>` : ''}
                     </div>
-                    ` : `
-                    <div class="task-header">
-                        <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
-                    </div>
-                    `}
+                    ` : ''}
                     <div class="task-title">${this.escapeHtml(task.text)}</div>
                 </div>
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
@@ -362,14 +349,15 @@ class TaskListApp {
         const completedTasks = this.tasks.filter(task => task.completed).length;
         const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
         
-        // Calculate points from completed tasks
+        // Calculate points from completed tasks (only count tasks that have points)
         const earnedPoints = this.tasks
-            .filter(task => task.completed)
-            .reduce((total, task) => total + (task.points || 5), 0);
+            .filter(task => task.completed && task.points !== null && task.points !== undefined)
+            .reduce((total, task) => total + task.points, 0);
         
-        // Calculate total points available from all tasks
+        // Calculate total points available from all tasks (only count tasks that have points)
         const totalPoints = this.tasks
-            .reduce((total, task) => total + (task.points || 5), 0);
+            .filter(task => task.points !== null && task.points !== undefined)
+            .reduce((total, task) => total + task.points, 0);
 
         document.getElementById('completed-count').textContent = completedTasks;
         document.getElementById('total-count').textContent = totalTasks;
