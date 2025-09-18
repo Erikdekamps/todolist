@@ -7,8 +7,9 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 ### Core Functionality
 - ✅ **Add & Manage Tasks** - Quick task creation with intuitive interface and custom points
 - 🎯 **Task Completion** - Click anywhere on a task to toggle completion
-- 🏆 **Smart Point System** - Dynamic points based on task complexity with custom override
-- 📊 **Progress Tracking** - Real-time progress bar and earned points display
+- �️ **Task Areas** - Organize tasks by area/category with visual badges
+- �🏆 **Smart Point System** - Dynamic points based on task complexity with custom override
+- 📊 **Progress Tracking** - Real-time progress bar with earned/total points display
 - 💾 **Local Storage** - Persistent data storage across sessions
 - 🔍 **Search & Filter** - Real-time task filtering with search functionality
 
@@ -43,6 +44,7 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 
 ### Adding Tasks
 - Type your task in the "Add new task" field
+- Optionally set an area/category (e.g., "Work", "Personal", "Dev")
 - Optionally set custom points (leave blank for auto-calculation)
 - Click the plus button or press Enter to add
 - **Keyboard Shortcut**: `Ctrl/Cmd + Enter` (from anywhere)
@@ -52,16 +54,24 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 - **Reorder Tasks**: Drag tasks using the handle (≡) icon on the left
 - **Search Tasks**: Use the search bar at the bottom
 - **Clear Search**: Press `Escape` while in search field
+- **Task Areas**: Organize tasks with color-coded area badges
 - **Custom Points**: Set specific point values when creating tasks
 
-### Point System
+### Point System & Progress
 - **Auto-calculation**: Based on task complexity and length
   - Base points: 5
   - Length bonus: +1 point per 10 characters (max 10 bonus)
   - Complexity bonus: +10 for keywords like "implement", "design", "develop"
 - **Custom Points**: Override auto-calculation by setting specific values
 - **Visual Feedback**: Points displayed as colored badges on each task
-- **Progress Tracking**: Total earned points shown in header
+- **Progress Tracking**: Shows earned points / total available points
+- **Completion Rate**: Displays completed tasks vs total tasks
+
+### Task Areas
+- **Organization**: Categorize tasks by area (Work, Personal, Dev, etc.)
+- **Visual Badges**: Areas appear as styled badges next to points
+- **Optional Field**: Leave blank if no categorization needed
+- **Search Integration**: Find tasks by area using the search function
 
 ### Import/Export
 - **Export**: Click "Export JSON" to download your tasks
@@ -144,7 +154,8 @@ todolist/
     "id": "unique-identifier",
     "text": "Task description",
     "completed": false,
-    "points": 15
+    "points": 15,
+    "area": "Work"
 }
 ```
 
@@ -155,12 +166,14 @@ Tasks should be provided as an array of task objects:
     {
         "text": "Complete project documentation",
         "completed": false,
-        "points": 12
+        "points": 12,
+        "area": "Work"
     },
     {
         "text": "Review code changes",
         "completed": true,
-        "points": 8
+        "points": 8,
+        "area": "Dev"
     }
 ]
 ```

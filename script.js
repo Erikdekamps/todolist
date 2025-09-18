@@ -64,24 +64,28 @@ class TaskListApp {
     handleTaskSubmit(e) {
         e.preventDefault();
         const taskInput = document.getElementById('task-input');
+        const areaInput = document.getElementById('area-input');
         const pointsInput = document.getElementById('points-input');
         const taskText = taskInput.value.trim();
+        const taskArea = areaInput.value.trim();
         const customPoints = pointsInput.value ? parseInt(pointsInput.value) : null;
 
         if (taskText) {
-            this.addTask(taskText, false, null, customPoints);
+            this.addTask(taskText, false, null, customPoints, taskArea);
             taskInput.value = '';
+            areaInput.value = '';
             pointsInput.value = '';
             taskInput.focus();
         }
     }
 
-    addTask(text, completed = false, id = null, points = null) {
+    addTask(text, completed = false, id = null, points = null, area = null) {
         const task = {
             id: id || this.generateId(),
             text: text,
             completed: completed,
-            points: points || this.calculateTaskPoints(text)
+            points: points || this.calculateTaskPoints(text),
+            area: area || null
         };
 
         this.tasks.push(task);
@@ -197,10 +201,17 @@ class TaskListApp {
                     </svg>
                 </div>
                 <div class="task-content">
-                    <div class="task-title">${this.escapeHtml(task.text)}</div>
-                    <div class="task-meta">
+                    ${task.area ? `
+                    <div class="task-header">
+                        <span class="task-area">${this.escapeHtml(task.area)}</span>
                         <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
                     </div>
+                    ` : `
+                    <div class="task-header">
+                        <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
+                    </div>
+                    `}
+                    <div class="task-title">${this.escapeHtml(task.text)}</div>
                 </div>
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
                      data-task-id="${task.id}"></div>
@@ -352,13 +363,18 @@ class TaskListApp {
         const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
         
         // Calculate points from completed tasks
-        const points = this.tasks
+        const earnedPoints = this.tasks
             .filter(task => task.completed)
+            .reduce((total, task) => total + (task.points || 5), 0);
+        
+        // Calculate total points available from all tasks
+        const totalPoints = this.tasks
             .reduce((total, task) => total + (task.points || 5), 0);
 
         document.getElementById('completed-count').textContent = completedTasks;
         document.getElementById('total-count').textContent = totalTasks;
-        document.getElementById('points').textContent = points;
+        document.getElementById('points').textContent = earnedPoints;
+        document.getElementById('total-points').textContent = totalPoints;
         document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
     }
 
@@ -441,7 +457,8 @@ class TaskListApp {
                         task.text,
                         Boolean(task.completed),
                         task.id || this.generateId(),
-                        task.points || null // Use imported points or let calculateTaskPoints handle it
+                        task.points || null, // Use imported points or let calculateTaskPoints handle it
+                        task.area || null // Use imported area or null
                     );
                     importedCount++;
                 }

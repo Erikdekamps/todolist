@@ -26,7 +26,7 @@
                         <span id="completed-count">0</span> of <span id="total-count">0</span> completed
                     </span>
                     <span class="progress-points">
-                        <span id="points">0</span> points
+                        <span id="points">0</span> / <span id="total-points">0</span> points
                     </span>
                 </div>
                 <div class="progress-bar">
@@ -47,6 +47,14 @@
                             id="task-input" 
                             placeholder="Add new task"
                             maxlength="200"
+                            autocomplete="off"
+                        >
+                        <input 
+                            type="text" 
+                            class="area-input" 
+                            id="area-input" 
+                            placeholder="Area"
+                            maxlength="50"
                             autocomplete="off"
                         >
                         <input 

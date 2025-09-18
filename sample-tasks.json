@@ -3,48 +3,56 @@
         "id": "sample1",
         "text": "Review project requirements",
         "completed": false,
-        "points": 8
+        "points": 8,
+        "area": "Work"
     },
     {
         "id": "sample2",
         "text": "Design user interface mockups",
         "completed": true,
-        "points": 15
+        "points": 15,
+        "area": "Design"
     },
     {
         "id": "sample3",
         "text": "Implement task drag and drop functionality",
         "completed": false,
-        "points": 20
+        "points": 20,
+        "area": "Dev"
     },
     {
         "id": "sample4",
         "text": "Write unit tests for core features",
         "completed": false,
-        "points": 12
+        "points": 12,
+        "area": "Testing"
     },
     {
         "id": "sample5",
         "text": "Optimize mobile performance",
         "completed": true,
-        "points": 18
+        "points": 18,
+        "area": "Dev"
     },
     {
         "id": "sample6",
         "text": "Deploy to production server",
         "completed": false,
-        "points": 10
+        "points": 10,
+        "area": "DevOps"
     },
     {
         "id": "sample7",
         "text": "Buy groceries",
         "completed": false,
-        "points": 5
+        "points": 5,
+        "area": "Personal"
     },
     {
         "id": "sample8",
         "text": "Create comprehensive documentation",
         "completed": false,
-        "points": 16
+        "points": 16,
+        "area": "Docs"
     }
 ]

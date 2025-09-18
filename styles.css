@@ -172,6 +172,18 @@ body {
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+.area-input {
+    width: 100px;
+    padding: var(--space-3) var(--space-2);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-medium);
+    background-color: var(--color-canvas-default);
+    color: var(--color-fg-default);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    text-align: center;
+}
+
 .points-input {
     width: 80px;
     padding: var(--space-3) var(--space-2);
@@ -186,12 +198,14 @@ body {
 
 /* WCAG AA Compliant placeholder styling */
 .task-input::placeholder,
+.area-input::placeholder,
 .points-input::placeholder {
     color: var(--color-placeholder);
     opacity: 1; /* Ensure full opacity for proper contrast */
 }
 
 .task-input:focus,
+.area-input:focus,
 .points-input:focus {
     outline: none;
     border-color: var(--color-accent-emphasis);
@@ -350,7 +364,14 @@ body {
     font-weight: 500;
     color: var(--color-fg-default);
     word-wrap: break-word;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     margin-bottom: var(--space-1);
+    flex-wrap: wrap;
 }
 
 .task-meta {
@@ -373,6 +394,17 @@ body {
 .task-points.completed {
     color: var(--color-success-emphasis);
     background-color: rgba(31, 136, 61, 0.1);
+}
+
+.task-area {
+    font-weight: 500;
+    color: var(--color-fg-muted);
+    background-color: var(--color-neutral-muted);
+    padding: 2px var(--space-2);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Task Checkbox - Now at the end */
@@ -578,6 +610,11 @@ body {
     }
     
     .task-input {
+        font-size: var(--font-size-normal);
+    }
+    
+    .area-input {
+        width: 85px;
         font-size: var(--font-size-normal);
     }
     
