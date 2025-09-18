@@ -1,4 +1,13 @@
-# TaskList - Mobile Todo App
+# Task### Core Functionality
+- ✅ **Add & Manage Tasks** - Quick task creation with intuitive interface and custom points
+- 🗑️ **Delete Tasks** - Individual task deletion with confirmation dialog
+- 🎯 **Task Completion** - Click anywhere on a task to toggle completion
+- 🏷️ **Task Areas** - Organize tasks by area/category with visual badges
+- 🏆 **Smart Point System** - Dynamic points based on task complexity with custom override
+- 📊 **Progress Tracking** - Real-time progress bar with earned/total points display
+- 💾 **Local Storage** - Persistent data storage across sessions
+- 🔍 **Search & Filter** - Real-time task filtering with search functionality
+- 🔄 **Reset Functionality** - Clear all data with confirmation dialogobile Todo App
 
 A beautiful, feature-rich mobile web application for managing your tasks, built with vanilla HTML, CSS, and JavaScript. Inspired by GitHub's design system and optimized for mobile devices.
 
@@ -14,18 +23,20 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 - 🔍 **Search & Filter** - Real-time task filtering with search functionality
 
 ### Advanced Features
-- 🖱️ **Drag & Drop Reordering** - Intuitive task reordering with handle-first design
+- 🖱️ **Drag & Drop Reordering** - Intuitive task reordering with visual drop indicators
 - 📱 **Touch-Optimized** - Smooth touch interactions for mobile devices
 - 📥 **JSON Import/Export** - Bulk task management with JSON files
 - ⌨️ **Keyboard Shortcuts** - Power user efficiency features
 - 🌙 **Dark Mode Support** - Automatic theme switching based on system preference
 - ♿ **WCAG AA Compliant** - Accessible design with proper color contrast and readable text
+- 🎯 **Hidden Scrollbars** - Clean interface with invisible scrollbars while maintaining functionality
 
 ### Mobile-First Design
-- 📱 **Responsive Layout** - Optimized for all screen sizes
+- 📱 **Responsive Layout** - Optimized for all screen sizes with no window scrollbars
 - 🎨 **GitHub Design System** - Professional, clean interface with accessibility focus
 - ⚡ **PWA Ready** - Install as a native app on mobile devices
 - 🔔 **Toast Notifications** - User-friendly feedback system
+- 🖼️ **Visual Feedback** - Drop lines, hover states, and smooth animations
 
 ## 🚀 Getting Started
 
@@ -51,6 +62,8 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 
 ### Managing Tasks
 - **Complete Task**: Click anywhere on the task content area
+- **Delete Task**: Hover over a task and click the red trash icon (with confirmation)
+- **Reset All**: Use the reset icon in the header to clear all tasks (with confirmation)
 - **Reorder Tasks**: Drag tasks using the handle (≡) icon on the left
 - **Search Tasks**: Use the search bar at the bottom
 - **Clear Search**: Press `Escape` while in search field
@@ -120,14 +133,16 @@ todolist/
 
 ### Performance
 - Lightweight vanilla JavaScript (~8KB)
-- CSS-only animations
-- Efficient DOM manipulation
+- CSS-only animations and transitions
+- Efficient DOM manipulation with minimal reflows
 - Local storage for instant loading
+- Hidden scrollbars with maintained functionality
+- Optimized viewport handling with no window scrollbars
 
 ### Design System
 
 ### Layout & Accessibility
-- **Task Layout**: Drag Handle (≡) → Task Content → Checkbox
+- **Task Layout**: Drag Handle (≡) → Task Content → Delete Button (on hover) → Checkbox
 - **WCAG AA Compliant**: All colors meet 4.5:1 contrast ratio requirements
 - **Accessible Text**: Input fields use proper text colors for readability
 - **Accessible Placeholders**: Proper contrast for form inputs
@@ -228,7 +243,10 @@ Contributions are welcome! Feel free to:
 
 ## 🙏 Acknowledgments
 
-- Inspired by GitHub's design system
-- Icons from GitHub's Octicons
-- Modern web standards and best practices
-AI generated todolist application thingie.
+- Inspired by GitHub's design system and modern web practices
+- Icons from GitHub's Octicons icon set
+- Built with vanilla web technologies for maximum compatibility and performance
+
+---
+
+*A modern, accessible task management application built with care for user experience and web standards.*
