@@ -255,15 +255,87 @@ body {
     fill: currentColor;
 }
 
-/* Task List */
+/* Task List - Split Panel Layout */
 .task-list-container {
-    min-height: 300px;
+    min-height: 400px;
+}
+
+.task-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    min-height: 400px;
+}
+
+.task-panel {
+    background-color: var(--color-canvas-subtle);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--border-radius-medium);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    background-color: var(--color-canvas-default);
+    border-bottom: 1px solid var(--color-border-muted);
+    padding: var(--space-3) var(--space-4);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.panel-title {
+    font-size: var(--font-size-normal);
+    font-weight: 600;
+    color: var(--color-fg-default);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.panel-icon {
+    fill: var(--color-fg-muted);
+}
+
+.active-panel .panel-icon {
+    fill: var(--color-accent-emphasis);
+}
+
+.completed-panel .panel-icon {
+    fill: var(--color-success-emphasis);
+}
+
+.task-count {
+    background-color: var(--color-neutral-muted);
+    color: var(--color-fg-default);
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    padding: 2px var(--space-2);
+    border-radius: 12px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.active-panel .task-count {
+    background-color: rgba(3, 102, 214, 0.1);
+    color: var(--color-accent-emphasis);
+}
+
+.completed-panel .task-count {
+    background-color: rgba(31, 136, 61, 0.1);
+    color: var(--color-success-emphasis);
 }
 
 .task-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    padding: var(--space-3);
+    flex: 1;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 /* Updated Task Item Layout: Drag Handle - Content - Checkbox */
@@ -410,26 +482,38 @@ body {
     margin-top: -2px;
 }
 
-/* Empty State */
+/* Empty State - Updated for panels */
 .empty-state {
     text-align: center;
-    padding: var(--space-6);
+    padding: var(--space-4);
     color: var(--color-fg-muted);
     display: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
 }
 
 .empty-state.visible {
-    display: block;
+    display: flex;
 }
 
 .empty-icon {
     fill: var(--color-fg-subtle);
     margin-bottom: var(--space-3);
+    opacity: 0.5;
 }
 
 .empty-state p:first-of-type {
     font-weight: 600;
     margin-bottom: var(--space-1);
+    font-size: var(--font-size-normal);
+}
+
+.empty-state p:last-of-type {
+    font-size: var(--font-size-small);
 }
 
 /* Footer */
@@ -605,6 +689,21 @@ body {
     
     .drag-handle {
         padding: var(--space-2);
+    }
+    
+    /* Stack panels vertically on mobile */
+    .task-panels {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+    
+    .task-list {
+        max-height: 40vh;
+    }
+    
+    .empty-state {
+        min-height: 150px;
+        padding: var(--space-3);
     }
 }
 

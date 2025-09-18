@@ -7,10 +7,11 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 ### Core Functionality
 - ✅ **Add & Manage Tasks** - Quick task creation with intuitive interface and custom points
 - 🎯 **Task Completion** - Click anywhere on a task to toggle completion
+- 📊 **Split Panel View** - Active tasks and completed tasks in separate organized panels
 - 🏆 **Smart Point System** - Dynamic points based on task complexity with custom override
-- 📊 **Progress Tracking** - Real-time progress bar and earned points display
+- � **Progress Tracking** - Real-time progress bar and earned points display
 - 💾 **Local Storage** - Persistent data storage across sessions
-- 🔍 **Search & Filter** - Real-time task filtering with search functionality
+- 🔍 **Search & Filter** - Real-time task filtering across both panels
 
 ### Advanced Features
 - 🖱️ **Drag & Drop Reordering** - Intuitive task reordering with handle-first design
@@ -49,10 +50,12 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 
 ### Managing Tasks
 - **Complete Task**: Click anywhere on the task content area
-- **Reorder Tasks**: Drag tasks using the handle (≡) icon on the left
-- **Search Tasks**: Use the search bar at the bottom
+- **Panel Organization**: Tasks automatically move between Active and Completed panels
+- **Reorder Tasks**: Drag tasks using the handle (≡) icon within the same panel
+- **Search Tasks**: Use the search bar to filter tasks across both panels
 - **Clear Search**: Press `Escape` while in search field
 - **Custom Points**: Set specific point values when creating tasks
+- **Task Counts**: Real-time counters show active and completed task counts
 
 ### Point System
 - **Auto-calculation**: Based on task complexity and length
@@ -84,9 +87,9 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 ### File Structure
 ```
 todolist/
-├── index.html          # Main application HTML
-├── styles.css          # Complete styling with GitHub theme
-├── script.js           # Full application logic
+├── index.html          # Main application HTML with split panel layout
+├── styles.css          # Complete styling with GitHub theme and panel design
+├── script.js           # Full application logic with split panel rendering
 ├── manifest.json       # PWA manifest
 ├── sw.js               # Service worker for offline support
 ├── sample-tasks.json   # Example tasks for import testing
@@ -117,11 +120,13 @@ todolist/
 ### Design System
 
 ### Layout & Accessibility
+- **Split Panel Design**: Active tasks (left) and completed tasks (right) panels
 - **Task Layout**: Drag Handle (≡) → Task Content → Checkbox
 - **WCAG AA Compliant**: All colors meet 4.5:1 contrast ratio requirements
 - **Accessible Text**: Input fields use proper text colors for readability
 - **Accessible Placeholders**: Proper contrast for form inputs
 - **Touch Targets**: Minimum 44px for mobile accessibility
+- **Responsive Layout**: Panels stack vertically on mobile devices
 
 ### Colors (GitHub Theme)
 - **Primary**: #0366d6 (GitHub blue)

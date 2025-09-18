@@ -156,33 +156,99 @@ class TaskListApp {
 
     filterTasks(searchTerm) {
         const taskElements = document.querySelectorAll('.task-item');
-        let visibleCount = 0;
+        let visibleActiveCount = 0;
+        let visibleCompletedCount = 0;
 
         taskElements.forEach(element => {
             const taskText = element.querySelector('.task-title').textContent.toLowerCase();
             const isVisible = !searchTerm || taskText.includes(searchTerm);
+            const isCompleted = element.classList.contains('completed');
             
             element.classList.toggle('hidden', !isVisible);
-            if (isVisible) visibleCount++;
+            if (isVisible) {
+                if (isCompleted) {
+                    visibleCompletedCount++;
+                } else {
+                    visibleActiveCount++;
+                }
+            }
         });
 
-        // Show empty state if no tasks are visible
-        this.toggleEmptyState(visibleCount === 0 && searchTerm);
+        // Update empty states based on search results
+        const activeEmptyState = document.getElementById('active-empty-state');
+        const completedEmptyState = document.getElementById('completed-empty-state');
+        
+        if (searchTerm) {
+            // Show search-specific empty states
+            if (visibleActiveCount === 0) {
+                activeEmptyState.classList.add('visible');
+                activeEmptyState.innerHTML = `
+                    <svg class="empty-icon" viewBox="0 0 16 16" width="32" height="32">
+                        <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.75.75 0 0 1-1.06 1.06l-3.04-3.04zM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0z"/>
+                    </svg>
+                    <p>No active tasks found</p>
+                    <p>Try a different search term</p>
+                `;
+            } else {
+                activeEmptyState.classList.remove('visible');
+            }
+            
+            if (visibleCompletedCount === 0) {
+                completedEmptyState.classList.add('visible');
+                completedEmptyState.innerHTML = `
+                    <svg class="empty-icon" viewBox="0 0 16 16" width="32" height="32">
+                        <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.75.75 0 0 1-1.06 1.06l-3.04-3.04zM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0z"/>
+                    </svg>
+                    <p>No completed tasks found</p>
+                    <p>Try a different search term</p>
+                `;
+            } else {
+                completedEmptyState.classList.remove('visible');
+            }
+        } else {
+            // Reset to normal empty states
+            this.renderTasks();
+        }
     }
 
     // Rendering
     renderTasks() {
-        const taskList = document.getElementById('task-list');
-        const emptyState = document.getElementById('empty-state');
+        const activeTaskList = document.getElementById('active-task-list');
+        const completedTaskList = document.getElementById('completed-task-list');
+        const activeEmptyState = document.getElementById('active-empty-state');
+        const completedEmptyState = document.getElementById('completed-empty-state');
+        const activeCountElement = document.getElementById('active-count');
+        const completedCountPanelElement = document.getElementById('completed-count-panel');
 
-        if (this.tasks.length === 0) {
-            taskList.innerHTML = '';
-            emptyState.classList.add('visible');
-            return;
+        // Split tasks into active and completed
+        const activeTasks = this.tasks.filter(task => !task.completed);
+        const completedTasks = this.tasks.filter(task => task.completed);
+
+        // Update counts
+        activeCountElement.textContent = activeTasks.length;
+        completedCountPanelElement.textContent = completedTasks.length;
+
+        // Render active tasks
+        if (activeTasks.length === 0) {
+            activeTaskList.innerHTML = '';
+            activeEmptyState.classList.add('visible');
+        } else {
+            activeEmptyState.classList.remove('visible');
+            activeTaskList.innerHTML = activeTasks.map((task, index) => 
+                this.createTaskElement(task, this.tasks.indexOf(task))
+            ).join('');
         }
 
-        emptyState.classList.remove('visible');
-        taskList.innerHTML = this.tasks.map((task, index) => this.createTaskElement(task, index)).join('');
+        // Render completed tasks
+        if (completedTasks.length === 0) {
+            completedTaskList.innerHTML = '';
+            completedEmptyState.classList.add('visible');
+        } else {
+            completedEmptyState.classList.remove('visible');
+            completedTaskList.innerHTML = completedTasks.map((task, index) => 
+                this.createTaskElement(task, this.tasks.indexOf(task))
+            ).join('');
+        }
         
         // Bind events for newly created task elements
         this.bindTaskEvents();
@@ -275,7 +341,16 @@ class TaskListApp {
         e.dataTransfer.dropEffect = 'move';
         
         if (e.currentTarget !== this.draggedElement) {
-            e.currentTarget.classList.add('drag-over');
+            // Check if the target is in the same panel as the dragged element
+            const draggedTaskId = this.draggedElement.dataset.taskId;
+            const targetTaskId = e.currentTarget.dataset.taskId;
+            const draggedTask = this.tasks.find(t => t.id === draggedTaskId);
+            const targetTask = this.tasks.find(t => t.id === targetTaskId);
+            
+            // Only show drag-over for tasks in the same completion status
+            if (draggedTask && targetTask && draggedTask.completed === targetTask.completed) {
+                e.currentTarget.classList.add('drag-over');
+            }
         }
     }
 
@@ -284,9 +359,18 @@ class TaskListApp {
         e.currentTarget.classList.remove('drag-over');
         
         if (this.draggedElement && e.currentTarget !== this.draggedElement) {
-            const fromIndex = parseInt(this.draggedElement.dataset.index);
-            const toIndex = parseInt(e.currentTarget.dataset.index);
-            this.moveTask(fromIndex, toIndex);
+            // Check if both tasks are in the same panel (both completed or both active)
+            const draggedTaskId = this.draggedElement.dataset.taskId;
+            const targetTaskId = e.currentTarget.dataset.taskId;
+            const draggedTask = this.tasks.find(t => t.id === draggedTaskId);
+            const targetTask = this.tasks.find(t => t.id === targetTaskId);
+            
+            // Only allow reordering within the same completion status
+            if (draggedTask && targetTask && draggedTask.completed === targetTask.completed) {
+                const fromIndex = parseInt(this.draggedElement.dataset.index);
+                const toIndex = parseInt(e.currentTarget.dataset.index);
+                this.moveTask(fromIndex, toIndex);
+            }
         }
     }
 
@@ -514,11 +598,6 @@ class TaskListApp {
         if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
         
         return date.toLocaleDateString();
-    }
-
-    toggleEmptyState(show) {
-        const emptyState = document.getElementById('empty-state');
-        emptyState.classList.toggle('visible', show);
     }
 
     // Toast Notifications

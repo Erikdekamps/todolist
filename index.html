@@ -84,17 +84,54 @@
                 </div>
             </div>
 
-            <!-- Task list container -->
+            <!-- Task list container with split panels -->
             <div class="task-list-container">
-                <div class="task-list" id="task-list">
-                    <!-- Tasks will be dynamically added here -->
-                </div>
-                <div class="empty-state" id="empty-state">
-                    <svg class="empty-icon" viewBox="0 0 16 16" width="48" height="48">
-                        <path d="M8 2a.75.75 0 0 1 .75.75v4.5h4.5a.75.75 0 0 1 0 1.5h-4.5v4.5a.75.75 0 0 1-1.5 0v-4.5h-4.5a.75.75 0 0 1 0-1.5h4.5v-4.5A.75.75 0 0 1 8 2z"/>
-                    </svg>
-                    <p>No tasks yet</p>
-                    <p>Add your first task above to get started</p>
+                <div class="task-panels">
+                    <!-- Active Tasks Panel -->
+                    <div class="task-panel active-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <svg class="panel-icon" viewBox="0 0 16 16" width="16" height="16">
+                                    <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/>
+                                </svg>
+                                Active Tasks
+                                <span class="task-count" id="active-count">0</span>
+                            </h3>
+                        </div>
+                        <div class="task-list" id="active-task-list">
+                            <!-- Active tasks will be dynamically added here -->
+                        </div>
+                        <div class="empty-state" id="active-empty-state">
+                            <svg class="empty-icon" viewBox="0 0 16 16" width="32" height="32">
+                                <path d="M8 2a.75.75 0 0 1 .75.75v4.5h4.5a.75.75 0 0 1 0 1.5h-4.5v4.5a.75.75 0 0 1-1.5 0v-4.5h-4.5a.75.75 0 0 1 0-1.5h4.5v-4.5A.75.75 0 0 1 8 2z"/>
+                            </svg>
+                            <p>No active tasks</p>
+                            <p>Add a task above to get started</p>
+                        </div>
+                    </div>
+
+                    <!-- Completed Tasks Panel -->
+                    <div class="task-panel completed-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <svg class="panel-icon" viewBox="0 0 16 16" width="16" height="16">
+                                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+                                </svg>
+                                Completed Tasks
+                                <span class="task-count" id="completed-count-panel">0</span>
+                            </h3>
+                        </div>
+                        <div class="task-list" id="completed-task-list">
+                            <!-- Completed tasks will be dynamically added here -->
+                        </div>
+                        <div class="empty-state" id="completed-empty-state">
+                            <svg class="empty-icon" viewBox="0 0 16 16" width="32" height="32">
+                                <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+                            </svg>
+                            <p>No completed tasks yet</p>
+                            <p>Complete some tasks to see them here</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
