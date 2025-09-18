@@ -1,0 +1,40 @@
+[
+    {
+        "id": "sample1",
+        "text": "Review project requirements",
+        "completed": false,
+        "createdAt": "2025-09-18T10:00:00.000Z"
+    },
+    {
+        "id": "sample2",
+        "text": "Design user interface mockups",
+        "completed": true,
+        "createdAt": "2025-09-18T09:00:00.000Z",
+        "completedAt": "2025-09-18T11:30:00.000Z"
+    },
+    {
+        "id": "sample3",
+        "text": "Implement task drag and drop functionality",
+        "completed": false,
+        "createdAt": "2025-09-18T08:00:00.000Z"
+    },
+    {
+        "id": "sample4",
+        "text": "Write unit tests for core features",
+        "completed": false,
+        "createdAt": "2025-09-18T07:00:00.000Z"
+    },
+    {
+        "id": "sample5",
+        "text": "Optimize mobile performance",
+        "completed": true,
+        "createdAt": "2025-09-18T06:00:00.000Z",
+        "completedAt": "2025-09-18T12:00:00.000Z"
+    },
+    {
+        "id": "sample6",
+        "text": "Deploy to production server",
+        "completed": false,
+        "createdAt": "2025-09-18T05:00:00.000Z"
+    }
+]
