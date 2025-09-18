@@ -67,14 +67,34 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    /* Improve text rendering on mobile */
+    text-rendering: optimizeLegibility;
+    /* Prevent selection highlighting on mobile gestures */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    /* Improve touch scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Allow text selection for inputs and content areas */
+input, textarea, .task-title {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
 }
 
 /* App Container */
 .app-container {
     min-height: 100vh;
+    /* Support for devices with notches */
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     max-width: 100%;
+    /* Add safe area padding for devices with notches */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* Header Styles */
@@ -82,6 +102,8 @@ body {
     background-color: var(--color-canvas-default);
     border-bottom: 1px solid var(--color-border-default);
     padding: var(--space-4);
+    /* Add safe area top padding */
+    padding-top: calc(var(--space-4) + env(safe-area-inset-top));
     position: sticky;
     top: 0;
     z-index: 100;
@@ -474,6 +496,8 @@ body {
     backdrop-filter: blur(8px);
     border-top: 1px solid var(--color-border-default);
     padding: var(--space-4);
+    /* Add safe area bottom padding */
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
     z-index: 100;
 }
 
@@ -592,13 +616,68 @@ body {
 }
 
 /* Responsive Design */
+/* Extra small screens (iPhone SE, small Androids) */
+@media (max-width: 375px) {
+    .main-content {
+        padding: 0 var(--space-2);
+    }
+    
+    .header, .footer {
+        padding: var(--space-2);
+    }
+    
+    .app-title {
+        font-size: 1.25rem;
+    }
+    
+    .input-group {
+        gap: var(--space-1);
+    }
+    
+    .task-input {
+        padding: 12px var(--space-2);
+        font-size: 16px;
+    }
+    
+    .area-input {
+        width: 80px;
+        padding: 12px var(--space-1);
+        font-size: 14px;
+    }
+    
+    .points-input {
+        width: 65px;
+        padding: 12px var(--space-1);
+        font-size: 14px;
+    }
+    
+    .add-button {
+        padding: 12px var(--space-2);
+        min-width: 50px;
+    }
+    
+    .task-item {
+        padding: var(--space-2);
+        margin-bottom: var(--space-1);
+    }
+    
+    .task-title {
+        font-size: 0.875rem;
+    }
+    
+    .task-area, .task-points {
+        font-size: 0.7rem;
+        padding: 2px var(--space-1);
+    }
+}
+
 @media (max-width: 480px) {
     .header {
         padding: var(--space-3);
     }
     
     .main-content {
-        padding: 0 var(--space-3);
+        padding: 0 var(--space-2);
     }
     
     .footer {
@@ -606,25 +685,39 @@ body {
     }
     
     .app-title {
-        font-size: var(--font-size-large);
+        font-size: 1.5rem;
     }
     
     .task-input {
         font-size: var(--font-size-normal);
+        padding: 14px var(--space-3);
     }
     
     .area-input {
-        width: 85px;
+        width: 90px;
         font-size: var(--font-size-normal);
+        padding: 14px var(--space-2);
     }
     
     .points-input {
-        width: 70px;
+        width: 75px;
         font-size: var(--font-size-normal);
+        padding: 14px var(--space-2);
+    }
+    
+    .add-button {
+        padding: 14px var(--space-3);
+        min-width: 60px;
+    }
+    
+    .input-group {
+        gap: var(--space-2);
     }
     
     .import-export-controls {
         justify-content: center;
+        gap: var(--space-2);
+        flex-wrap: wrap;
     }
     
     .toast-container {
@@ -634,14 +727,84 @@ body {
     
     .toast {
         min-width: auto;
+        padding: var(--space-3);
     }
     
     .task-item {
         padding: var(--space-3);
+        margin-bottom: var(--space-2);
+        min-height: 68px;
+    }
+    
+    .task-header {
+        margin-bottom: var(--space-2);
+    }
+    
+    .task-title {
+        font-size: var(--font-size-normal);
+        line-height: 1.4;
+    }
+    
+    .task-area {
+        font-size: 0.75rem;
+        padding: 3px var(--space-2);
+    }
+    
+    .task-points {
+        font-size: 0.75rem;
+        padding: 3px var(--space-2);
     }
     
     .drag-handle {
         padding: var(--space-2);
+        min-width: 32px;
+        min-height: 32px;
+    }
+    
+    .task-checkbox {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+    }
+    
+    .search-input {
+        padding: 14px var(--space-3);
+        font-size: var(--font-size-normal);
+    }
+}
+
+/* Medium screens */
+@media (max-width: 768px) and (min-width: 481px) {
+    .main-content {
+        padding: 0 var(--space-3);
+    }
+    
+    .task-item {
+        padding: var(--space-3);
+        margin-bottom: var(--space-2);
+        min-height: 60px;
+    }
+    
+    .input-group {
+        gap: var(--space-2);
+    }
+    
+    .task-input {
+        padding: 12px var(--space-3);
+    }
+    
+    .area-input {
+        width: 100px;
+        padding: 12px var(--space-2);
+    }
+    
+    .points-input {
+        width: 80px;
+        padding: 12px var(--space-2);
+    }
+    
+    .add-button {
+        padding: 12px var(--space-3);
     }
 }
 
@@ -659,22 +822,61 @@ body {
 /* Touch improvements for mobile */
 @media (hover: none) and (pointer: coarse) {
     .task-item {
-        min-height: 64px;
+        min-height: 68px;
+        transition: background-color 0.15s ease;
+    }
+    
+    .task-item:active {
+        background-color: var(--color-neutral-muted);
     }
     
     .add-button {
-        min-width: 52px;
-        min-height: 52px;
+        min-width: 56px;
+        min-height: 56px;
+        transition: all 0.15s ease;
+    }
+    
+    .add-button:active {
+        transform: scale(0.98);
     }
     
     .task-checkbox {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        transition: all 0.15s ease;
+    }
+    
+    .task-checkbox:active {
+        transform: scale(0.95);
     }
     
     .drag-handle {
         opacity: 1;
         padding: var(--space-2);
+        min-width: 36px;
+        min-height: 36px;
+        transition: background-color 0.15s ease;
+    }
+    
+    .drag-handle:active {
+        background-color: var(--color-neutral-muted);
+        border-radius: 4px;
+    }
+    
+    /* Larger tap targets for buttons */
+    button, .task-checkbox, .drag-handle {
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Improve text input on mobile */
+    input[type="text"], input[type="number"] {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px var(--space-3);
+    }
+    
+    .area-input, .points-input {
+        padding: 14px var(--space-2);
     }
 }
 
