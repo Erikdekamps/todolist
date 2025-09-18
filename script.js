@@ -15,10 +15,26 @@ class TaskListApp {
 
     init() {
         this.loadTasksFromStorage();
+        this.migrateTasks(); // Ensure all tasks have points
         this.bindEvents();
         this.renderTasks();
         this.updateProgress();
         this.showToast('Welcome to TaskList!', 'info');
+    }
+
+    // Migration function to add points to existing tasks
+    migrateTasks() {
+        let needsSave = false;
+        this.tasks.forEach(task => {
+            if (typeof task.points === 'undefined' || task.points === null) {
+                task.points = this.calculateTaskPoints(task.text);
+                needsSave = true;
+            }
+        });
+        
+        if (needsSave) {
+            this.saveTasksToStorage();
+        }
     }
 
     // Event Binding
@@ -48,20 +64,24 @@ class TaskListApp {
     handleTaskSubmit(e) {
         e.preventDefault();
         const taskInput = document.getElementById('task-input');
+        const pointsInput = document.getElementById('points-input');
         const taskText = taskInput.value.trim();
+        const customPoints = pointsInput.value ? parseInt(pointsInput.value) : null;
 
         if (taskText) {
-            this.addTask(taskText);
+            this.addTask(taskText, false, null, customPoints);
             taskInput.value = '';
+            pointsInput.value = '';
             taskInput.focus();
         }
     }
 
-    addTask(text, completed = false, id = null) {
+    addTask(text, completed = false, id = null, points = null) {
         const task = {
             id: id || this.generateId(),
             text: text,
             completed: completed,
+            points: points || this.calculateTaskPoints(text),
             createdAt: new Date().toISOString(),
             completedAt: completed ? new Date().toISOString() : null
         };
@@ -74,6 +94,22 @@ class TaskListApp {
         if (!id) {
             this.showToast('Task added successfully!', 'success');
         }
+    }
+
+    calculateTaskPoints(text) {
+        // Base points calculation based on task complexity/length
+        const basePoints = 5;
+        const lengthBonus = Math.min(Math.floor(text.length / 10), 10); // Up to 10 bonus points
+        
+        // Keywords that indicate higher complexity
+        const complexityKeywords = ['implement', 'design', 'develop', 'create', 'build', 'optimize', 'analyze', 'research'];
+        const hasComplexity = complexityKeywords.some(keyword => 
+            text.toLowerCase().includes(keyword)
+        );
+        
+        const complexityBonus = hasComplexity ? 10 : 0;
+        
+        return basePoints + lengthBonus + complexityBonus;
     }
 
     toggleTask(taskId) {
@@ -161,20 +197,21 @@ class TaskListApp {
                  data-task-id="${task.id}" 
                  data-index="${index}"
                  draggable="true">
-                <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
-                     data-task-id="${task.id}"></div>
-                <div class="task-content">
-                    <div class="task-title">${this.escapeHtml(task.text)}</div>
-                    <div class="task-meta">
-                        <span>Created ${timeAgo}</span>
-                        ${task.completed ? `<span>Completed ${this.getTimeAgo(task.completedAt)}</span>` : ''}
-                    </div>
-                </div>
                 <div class="drag-handle" title="Drag to reorder">
                     <svg viewBox="0 0 16 16" width="16" height="16">
                         <path d="M10 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
                     </svg>
                 </div>
+                <div class="task-content">
+                    <div class="task-title">${this.escapeHtml(task.text)}</div>
+                    <div class="task-meta">
+                        <span class="task-points ${task.completed ? 'completed' : ''}">${task.points || 5} pts</span>
+                        <span>Created ${timeAgo}</span>
+                        ${task.completed ? `<span>Completed ${this.getTimeAgo(task.completedAt)}</span>` : ''}
+                    </div>
+                </div>
+                <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                     data-task-id="${task.id}"></div>
             </div>
         `;
     }
@@ -321,7 +358,11 @@ class TaskListApp {
         const totalTasks = this.tasks.length;
         const completedTasks = this.tasks.filter(task => task.completed).length;
         const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-        const points = completedTasks * 10; // 10 points per completed task
+        
+        // Calculate points from completed tasks
+        const points = this.tasks
+            .filter(task => task.completed)
+            .reduce((total, task) => total + (task.points || 5), 0);
 
         document.getElementById('completed-count').textContent = completedTasks;
         document.getElementById('total-count').textContent = totalTasks;
@@ -407,7 +448,8 @@ class TaskListApp {
                     this.addTask(
                         task.text,
                         Boolean(task.completed),
-                        task.id || this.generateId()
+                        task.id || this.generateId(),
+                        task.points || null // Use imported points or let calculateTaskPoints handle it
                     );
                     importedCount++;
                 }

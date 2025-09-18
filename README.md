@@ -5,22 +5,24 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 ## ✨ Features
 
 ### Core Functionality
-- ✅ **Add & Manage Tasks** - Quick task creation with intuitive interface
+- ✅ **Add & Manage Tasks** - Quick task creation with intuitive interface and custom points
 - 🎯 **Task Completion** - Click anywhere on a task to toggle completion
-- 📊 **Progress Tracking** - Real-time progress bar and points system
+- 🏆 **Smart Point System** - Dynamic points based on task complexity with custom override
+- 📊 **Progress Tracking** - Real-time progress bar and earned points display
 - 💾 **Local Storage** - Persistent data storage across sessions
 - 🔍 **Search & Filter** - Real-time task filtering with search functionality
 
 ### Advanced Features
-- 🖱️ **Drag & Drop Reordering** - Intuitive task reordering (desktop & mobile)
+- 🖱️ **Drag & Drop Reordering** - Intuitive task reordering with handle-first design
 - 📱 **Touch-Optimized** - Smooth touch interactions for mobile devices
 - 📥 **JSON Import/Export** - Bulk task management with JSON files
 - ⌨️ **Keyboard Shortcuts** - Power user efficiency features
 - 🌙 **Dark Mode Support** - Automatic theme switching based on system preference
+- ♿ **WCAG AA Compliant** - Accessible design with proper color contrast and readable text
 
 ### Mobile-First Design
 - 📱 **Responsive Layout** - Optimized for all screen sizes
-- 🎨 **GitHub Design System** - Professional, clean interface
+- 🎨 **GitHub Design System** - Professional, clean interface with accessibility focus
 - ⚡ **PWA Ready** - Install as a native app on mobile devices
 - 🔔 **Toast Notifications** - User-friendly feedback system
 
@@ -41,14 +43,25 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 
 ### Adding Tasks
 - Type your task in the "Add new task" field
+- Optionally set custom points (leave blank for auto-calculation)
 - Click the plus button or press Enter to add
 - **Keyboard Shortcut**: `Ctrl/Cmd + Enter` (from anywhere)
 
 ### Managing Tasks
-- **Complete Task**: Click anywhere on the task
-- **Reorder Tasks**: Drag tasks using the handle (≡) icon
+- **Complete Task**: Click anywhere on the task content area
+- **Reorder Tasks**: Drag tasks using the handle (≡) icon on the left
 - **Search Tasks**: Use the search bar at the bottom
 - **Clear Search**: Press `Escape` while in search field
+- **Custom Points**: Set specific point values when creating tasks
+
+### Point System
+- **Auto-calculation**: Based on task complexity and length
+  - Base points: 5
+  - Length bonus: +1 point per 10 characters (max 10 bonus)
+  - Complexity bonus: +10 for keywords like "implement", "design", "develop"
+- **Custom Points**: Override auto-calculation by setting specific values
+- **Visual Feedback**: Points displayed as colored badges on each task
+- **Progress Tracking**: Total earned points shown in header
 
 ### Import/Export
 - **Export**: Click "Export JSON" to download your tasks
@@ -101,12 +114,21 @@ todolist/
 - Efficient DOM manipulation
 - Local storage for instant loading
 
-## 🎨 Design System
+### Design System
+
+### Layout & Accessibility
+- **Task Layout**: Drag Handle (≡) → Task Content → Checkbox
+- **WCAG AA Compliant**: All colors meet 4.5:1 contrast ratio requirements
+- **Accessible Text**: Input fields use proper text colors for readability
+- **Accessible Placeholders**: Proper contrast for form inputs
+- **Touch Targets**: Minimum 44px for mobile accessibility
 
 ### Colors (GitHub Theme)
 - **Primary**: #0366d6 (GitHub blue)
 - **Success**: #1f883d (Green for completed tasks)
-- **Text**: #24292f (Primary text)
+- **Text**: #1f2328 (Primary text - WCAG AA compliant)
+- **Input Text**: #1f2328 (Input field text - WCAG AA compliant)
+- **Placeholder**: #57606a (WCAG AA compliant placeholder text)
 - **Background**: #ffffff (Light), #0d1117 (Dark)
 
 ### Typography
@@ -122,6 +144,7 @@ todolist/
     "id": "unique-identifier",
     "text": "Task description",
     "completed": false,
+    "points": 15,
     "createdAt": "2025-09-18T10:00:00.000Z",
     "completedAt": null
 }
@@ -133,11 +156,13 @@ Tasks should be provided as an array of task objects:
 [
     {
         "text": "Complete project documentation",
-        "completed": false
+        "completed": false,
+        "points": 12
     },
     {
         "text": "Review code changes",
-        "completed": true
+        "completed": true,
+        "points": 8
     }
 ]
 ```
@@ -156,8 +181,15 @@ Edit CSS custom properties in `:root` selector in `styles.css`:
 ### Modifying Point System
 Update the points calculation in `script.js`:
 ```javascript
-const points = completedTasks * 10; // Change multiplier here
+calculateTaskPoints(text) {
+    const basePoints = 5; // Change base points here
+    const lengthBonus = Math.min(Math.floor(text.length / 10), 10);
+    // Modify complexity keywords and bonus as needed
+}
 ```
+
+### Custom Point Values
+When adding tasks, users can override auto-calculated points by entering a custom value in the points field.
 
 ## 🚀 Deployment
 
