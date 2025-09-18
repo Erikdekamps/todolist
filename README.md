@@ -50,7 +50,7 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 
 ### Managing Tasks
 - **Complete Task**: Click anywhere on the task content area
-- **Panel Organization**: Tasks automatically move between Active and Completed panels
+- **Panel Organization**: Tasks automatically move between Active (top) and Completed (bottom) panels
 - **Reorder Tasks**: Drag tasks using the handle (≡) icon within the same panel
 - **Search Tasks**: Use the search bar to filter tasks across both panels
 - **Clear Search**: Press `Escape` while in search field
@@ -87,8 +87,8 @@ A beautiful, feature-rich mobile web application for managing your tasks, built 
 ### File Structure
 ```
 todolist/
-├── index.html          # Main application HTML with split panel layout
-├── styles.css          # Complete styling with GitHub theme and panel design
+├── index.html          # Main application HTML with vertical panel layout
+├── styles.css          # Complete styling with GitHub theme and vertical panel design
 ├── script.js           # Full application logic with split panel rendering
 ├── manifest.json       # PWA manifest
 ├── sw.js               # Service worker for offline support
@@ -120,13 +120,13 @@ todolist/
 ### Design System
 
 ### Layout & Accessibility
-- **Split Panel Design**: Active tasks (left) and completed tasks (right) panels
+- **Vertical Panel Design**: Active tasks (top) and completed tasks (bottom) panels
 - **Task Layout**: Drag Handle (≡) → Task Content → Checkbox
 - **WCAG AA Compliant**: All colors meet 4.5:1 contrast ratio requirements
 - **Accessible Text**: Input fields use proper text colors for readability
 - **Accessible Placeholders**: Proper contrast for form inputs
 - **Touch Targets**: Minimum 44px for mobile accessibility
-- **Responsive Layout**: Panels stack vertically on mobile devices
+- **Optimized for All Screens**: Consistent vertical layout across all device sizes
 
 ### Colors (GitHub Theme)
 - **Primary**: #0366d6 (GitHub blue)
