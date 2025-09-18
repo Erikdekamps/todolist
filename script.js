@@ -241,6 +241,15 @@ class TaskListApp {
         document.querySelectorAll('.task-checkbox').forEach(checkbox => {
             checkbox.addEventListener('click', this.handleCheckboxClick.bind(this));
         });
+
+        // Bottom drop zone events
+        const dropZone = document.getElementById('drop-zone-bottom');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', this.handleBottomDropZoneDragOver.bind(this));
+            dropZone.addEventListener('dragenter', this.handleDragEnter.bind(this));
+            dropZone.addEventListener('dragleave', this.handleBottomDropZoneDragLeave.bind(this));
+            dropZone.addEventListener('drop', this.handleBottomDropZoneDrop.bind(this));
+        }
     }
 
     handleTaskClick(e) {
@@ -282,6 +291,13 @@ class TaskListApp {
         document.querySelectorAll('.task-item').forEach(item => {
             item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
         });
+        
+        // Clean up drop zone
+        const dropZone = document.getElementById('drop-zone-bottom');
+        if (dropZone) {
+            dropZone.classList.remove('drag-over');
+        }
+        
         this.draggedElement = null;
     }
 
@@ -343,6 +359,49 @@ class TaskListApp {
         document.querySelectorAll('.task-item').forEach(item => {
             item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
         });
+        
+        // Clean up drop zone
+        const dropZone = document.getElementById('drop-zone-bottom');
+        if (dropZone) {
+            dropZone.classList.remove('drag-over');
+        }
+    }
+
+    // Bottom Drop Zone Handlers
+    handleBottomDropZoneDragOver(e) {
+        if (!this.draggedElement) return;
+        
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        // Remove all task drop indicators
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
+        });
+        
+        // Show drop zone as active
+        e.currentTarget.classList.add('drag-over');
+    }
+
+    handleBottomDropZoneDragLeave(e) {
+        // Only remove if we're actually leaving the drop zone
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+    }
+
+    handleBottomDropZoneDrop(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+        
+        if (this.draggedElement) {
+            const fromIndex = parseInt(this.draggedElement.dataset.index);
+            const toIndex = this.tasks.length; // Move to end
+            
+            if (!isNaN(fromIndex)) {
+                this.moveTask(fromIndex, toIndex);
+            }
+        }
     }
 
     // Touch Events for Mobile Drag and Drop
@@ -377,14 +436,25 @@ class TaskListApp {
             // Find element under touch point
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             const taskItemBelow = elementBelow?.closest('.task-item');
+            const dropZoneBelow = elementBelow?.closest('.drop-zone-bottom');
             
             // Remove previous drag indicators
             document.querySelectorAll('.task-item').forEach(item => {
                 item.classList.remove('drag-over', 'drop-line-above', 'drop-line-below');
             });
             
-            // Add drop line indicator to current target
-            if (taskItemBelow && taskItemBelow !== this.draggedElement) {
+            // Clean up drop zone
+            const dropZone = document.getElementById('drop-zone-bottom');
+            if (dropZone) {
+                dropZone.classList.remove('drag-over');
+            }
+            
+            // Handle drop zone
+            if (dropZoneBelow) {
+                dropZoneBelow.classList.add('drag-over');
+            }
+            // Add drop line indicator to current task target
+            else if (taskItemBelow && taskItemBelow !== this.draggedElement) {
                 const rect = taskItemBelow.getBoundingClientRect();
                 const midpoint = rect.top + rect.height / 2;
                 const touchY = touch.clientY;
@@ -406,8 +476,13 @@ class TaskListApp {
             const touch = e.changedTouches[0];
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             const taskItemBelow = elementBelow?.closest('.task-item');
+            const dropZoneBelow = elementBelow?.closest('.drop-zone-bottom');
             
-            if (taskItemBelow && taskItemBelow !== this.draggedElement) {
+            if (dropZoneBelow) {
+                // Dropped on bottom drop zone - move to end
+                const fromIndex = parseInt(this.draggedElement.dataset.index);
+                this.moveTask(fromIndex, this.tasks.length);
+            } else if (taskItemBelow && taskItemBelow !== this.draggedElement) {
                 const fromIndex = parseInt(this.draggedElement.dataset.index);
                 let toIndex = parseInt(taskItemBelow.dataset.index);
                 
@@ -438,6 +513,12 @@ class TaskListApp {
         document.querySelectorAll('.task-item').forEach(item => {
             item.classList.remove('dragging', 'drag-over', 'drop-line-above', 'drop-line-below');
         });
+        
+        // Clean up drop zone
+        const dropZone = document.getElementById('drop-zone-bottom');
+        if (dropZone) {
+            dropZone.classList.remove('drag-over');
+        }
         
         this.draggedElement = null;
         this.isDragging = false;

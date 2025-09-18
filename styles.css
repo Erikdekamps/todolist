@@ -302,6 +302,21 @@ input, textarea, .task-title {
     gap: var(--space-2);
 }
 
+/* Bottom drop zone for dragging to end */
+.drop-zone-bottom {
+    min-height: 40px;
+    opacity: 0;
+    transition: all 0.2s ease;
+    border-radius: var(--border-radius);
+    margin-top: var(--space-2);
+}
+
+.drop-zone-bottom.drag-over {
+    opacity: 1;
+    background-color: rgba(3, 102, 214, 0.1);
+    border: 2px dashed var(--color-accent-emphasis);
+}
+
 /* Updated Task Item Layout: Drag Handle - Content - Checkbox */
 .task-item {
     background-color: var(--color-canvas-default);
