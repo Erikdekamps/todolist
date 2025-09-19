@@ -39,33 +39,48 @@ class TaskListApp {
         const searchInput = document.getElementById('search-input');
         searchInput.addEventListener('input', this.handleSearch.bind(this));
 
-        // Import/Export functionality
-        const importButton = document.getElementById('import-button');
-        const exportButton = document.getElementById('export-button');
-        const fileInput = document.getElementById('json-file-input');
-
-        importButton.addEventListener('click', () => fileInput.click());
-        exportButton.addEventListener('click', this.exportTasks.bind(this));
-        fileInput.addEventListener('change', this.handleFileImport.bind(this));
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
+        // Table header filter functionality
+        const filterArea = document.getElementById('filter-area');
+        if (filterArea) {
+            filterArea.addEventListener('input', this.handleTableFilter.bind(this));
+        }
+        const filterPoints = document.getElementById('filter-points');
+        if (filterPoints) {
+            filterPoints.addEventListener('input', this.handleTableFilter.bind(this));
+        }
     }
+
+    handleTableFilter() {
+        const areaValue = (document.getElementById('filter-area')?.value || '').toLowerCase().trim();
+        const pointsValue = parseInt(document.getElementById('filter-points')?.value, 10);
+
+        document.querySelectorAll('.task-list-table tbody tr').forEach(row => {
+            const areaCell = row.querySelector('.task-area');
+            const pointsCell = row.querySelector('.task-points');
+            let areaText = areaCell ? areaCell.textContent.toLowerCase().trim() : '';
+            let pointsNum = pointsCell ? parseInt(pointsCell.textContent, 10) : null;
+
+            let areaMatch = !areaValue || areaText.includes(areaValue);
+            let pointsMatch = isNaN(pointsValue) || (pointsNum !== null && pointsNum >= pointsValue);
+
+            row.style.display = (areaMatch && pointsMatch) ? '' : 'none';
+        });
+    }
+
+    // Import/Export functionality
+    // ...existing code...
 
     // Task Management
     handleTaskSubmit(e) {
         e.preventDefault();
         const taskInput = document.getElementById('task-input');
-        const areaInput = document.getElementById('area-input');
         const pointsInput = document.getElementById('points-input');
         const taskText = taskInput.value.trim();
-        const taskArea = areaInput.value.trim();
         const customPoints = pointsInput.value ? parseInt(pointsInput.value) : null;
 
         if (taskText) {
-            this.addTask(taskText, false, null, customPoints, taskArea);
+            this.addTask(taskText, false, null, customPoints);
             taskInput.value = '';
-            areaInput.value = '';
             pointsInput.value = '';
             taskInput.focus();
         }
@@ -76,15 +91,14 @@ class TaskListApp {
             id: id || this.generateId(),
             text: text,
             completed: completed,
-            points: points, // Don't default to calculateTaskPoints if points is explicitly null
-            area: area || null
+            points: points // Don't default to calculateTaskPoints if points is explicitly null
         };
 
         this.tasks.push(task);
         this.saveTasksToStorage();
         this.renderTasks();
         this.updateProgress();
-        
+
         if (!id) {
             this.showToast('Task added successfully!', 'success');
         }
@@ -176,7 +190,7 @@ class TaskListApp {
 
     // Rendering
     renderTasks() {
-        const taskList = document.getElementById('task-list');
+        const taskList = document.getElementById('task-list'); // tbody
         const emptyState = document.getElementById('empty-state');
 
         if (this.tasks.length === 0) {
@@ -186,90 +200,43 @@ class TaskListApp {
         }
 
         emptyState.classList.remove('visible');
-        taskList.innerHTML = this.tasks.map((task, index) => this.createTaskElement(task, index)).join('');
-        
-        // Bind events for newly created task elements
-        this.bindTaskEvents();
+        taskList.innerHTML = this.tasks.map((task, index) => this.createTaskRow(task, index)).join('');
+
+        // Bind events for table rows
+        this.bindTaskTableEvents();
     }
 
-    createTaskElement(task, index) {
+    createTaskRow(task, index) {
         return `
-            <div class="task-item ${task.completed ? 'completed' : ''}" 
-                 data-task-id="${task.id}" 
-                 data-index="${index}"
-                 draggable="true">
-                <div class="drag-handle" title="Drag to reorder" draggable="true">
-                    <svg viewBox="0 0 16 16" width="16" height="16">
-                        <path d="M10 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM10 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM6 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                    </svg>
-                </div>
-                <div class="task-content">
-                    ${task.area || (task.points !== null && task.points !== undefined) ? `
-                    <div class="task-header">
-                        ${task.area ? `<span class="task-area">${this.escapeHtml(task.area)}</span>` : ''}
-                        ${(task.points !== null && task.points !== undefined) ? `<span class="task-points ${task.completed ? 'completed' : ''}">${task.points} pts</span>` : ''}
-                    </div>
-                    ` : ''}
-                    <div class="task-title">${this.escapeHtml(task.text)}</div>
-                </div>
-                <div class="task-actions">
-                    <button class="delete-task-btn" data-task-id="${task.id}" title="Delete task">
-                        <svg viewBox="0 0 16 16" width="14" height="14">
-                            <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.585 15h-5.17a1.748 1.748 0 0 1-1.751-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15zM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25z"/>
-                        </svg>
-                    </button>
-                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
-                         data-task-id="${task.id}"></div>
-                </div>
-            </div>
+            <tr class="${task.completed ? 'completed' : ''}" data-task-id="${task.id}" data-index="${index}">
+                <td class="task-num-col">${index + 1}</td>
+                <td class="task-title-col">
+                    <span class="task-title">${this.escapeHtml(task.text)}</span>
+                </td>
+                <td class="task-points-col">
+                    ${(task.points !== null && task.points !== undefined) ? `<span class="pill ${task.completed ? 'completed' : ''}">${task.points}</span>` : ''}
+                </td>
+            </tr>
         `;
     }
 
-    bindTaskEvents() {
-        // Task click events
-        document.querySelectorAll('.task-item').forEach(item => {
-            item.addEventListener('click', this.handleTaskClick.bind(this));
-            
-            // Drag and drop events - only for desktop
-            item.addEventListener('dragstart', this.handleDragStart.bind(this));
-            item.addEventListener('dragend', this.handleDragEnd.bind(this));
-            item.addEventListener('dragover', this.handleDragOver.bind(this));
-            item.addEventListener('dragenter', this.handleDragEnter.bind(this));
-            item.addEventListener('dragleave', this.handleDragLeave.bind(this));
-            item.addEventListener('drop', this.handleDrop.bind(this));
-            
-            // Touch events for mobile drag and drop
-            item.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-            item.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-            item.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
-        });
-
-        // Checkbox events
-        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('click', this.handleCheckboxClick.bind(this));
+    bindTaskTableEvents() {
+        // Task row click events
+        document.querySelectorAll('.task-list-table tbody tr').forEach(row => {
+            row.addEventListener('click', this.handleTaskRowClick.bind(this));
         });
 
         // Delete button events
         document.querySelectorAll('.delete-task-btn').forEach(deleteBtn => {
             deleteBtn.addEventListener('click', this.handleDeleteClick.bind(this));
         });
-
-        // Bottom drop zone events
-        const dropZone = document.getElementById('drop-zone-bottom');
-        if (dropZone) {
-            dropZone.addEventListener('dragover', this.handleBottomDropZoneDragOver.bind(this));
-            dropZone.addEventListener('dragenter', this.handleDragEnter.bind(this));
-            dropZone.addEventListener('dragleave', this.handleBottomDropZoneDragLeave.bind(this));
-            dropZone.addEventListener('drop', this.handleBottomDropZoneDrop.bind(this));
-        }
     }
 
-    handleTaskClick(e) {
-        // Don't toggle when clicking checkbox or if we just finished dragging
-        if (e.target.closest('.task-checkbox') || this.draggedElement) {
+    handleTaskRowClick(e) {
+        // Don't toggle when clicking delete button
+        if (e.target.closest('.delete-task-btn')) {
             return;
         }
-        
         const taskId = e.currentTarget.dataset.taskId;
         this.toggleTask(taskId);
     }
@@ -642,14 +609,13 @@ class TaskListApp {
                 const exists = this.tasks.some(existingTask => 
                     existingTask.text === task.text || existingTask.id === task.id
                 );
-                
+
                 if (!exists) {
                     this.addTask(
                         task.text,
                         Boolean(task.completed),
                         task.id || this.generateId(),
-                        task.points || null, // Use imported points or let calculateTaskPoints handle it
-                        task.area || null // Use imported area or null
+                        task.points || null
                     );
                     importedCount++;
                 }

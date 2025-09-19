@@ -1,3 +1,27 @@
+/* Pill styles for area and points inside task column */
+.task-meta-pills {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    vertical-align: middle;
+}
+.pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(3, 102, 214, 0.1);
+    color: var(--color-accent-emphasis);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+.pill.completed {
+    background: rgba(31, 136, 61, 0.1);
+    color: var(--color-success-emphasis);
+}
 /* CSS Reset and Base Styles */
 * {
     margin: 0;
@@ -320,10 +344,101 @@ input, textarea, .task-title {
     min-height: 300px;
 }
 
+
+/* Table-like Task List Styles */
+.task-list-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.task-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-small);
+    background: var(--color-canvas-default);
+    min-width: 320px;
+}
+
+.task-list-table th, .task-list-table td {
+    border: 1px solid var(--color-border-default);
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: var(--font-size-small);
+    min-width: 32px;
+    max-width: 120px;
+    word-break: break-word;
+}
+
+.task-list-table th {
+    background: var(--color-canvas-subtle);
+    font-weight: 600;
+    color: var(--color-fg-muted);
+    padding: 4px 6px;
+}
+
+.task-list-table .task-num-col {
+    width: 28px;
+    text-align: center;
+    font-weight: 600;
+}
+.task-list-table .task-title-col {
+    width: 100%;
+}
+.task-list-table .task-area-col {
+    width: 120px;
+    min-width: 100px;
+    max-width: 180px;
+    text-align: center;
+}
+.task-list-table .task-points-col {
+    width: 80px;
+    min-width: 60px;
+    max-width: 120px;
+    text-align: center;
+}
+/* Table header filter input styles */
+.table-filter-input {
+    width: 90%;
+    font-size: 12px;
+    padding: 2px 4px;
+    margin-top: 2px;
+        width: 48px;
+        min-width: 36px;
+        max-width: 60px;
+        text-align: right;
+        padding-right: 8px;
+    box-sizing: border-box;
+}
+.table-filter-input:focus {
+    outline: none;
+    border-color: var(--color-accent-emphasis);
+}
+.task-list-table .task-actions-col {
+    width: 40px;
+    text-align: center;
+}
+
+.task-list-table tr {
+    transition: background 0.1s;
+}
+
+.task-list-table tr.completed {
+    background: var(--color-canvas-subtle);
+    opacity: 0.7;
+}
+.task-list-table tr.completed td,
+.task-list-table tr.completed td * {
+    text-decoration: line-through;
+    color: var(--color-fg-muted) !important;
+}
+.task-list-table tr:hover {
+    background: var(--color-neutral-muted);
+}
+
+/* Remove default flex task-list for table layout */
 .task-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    display: contents;
 }
 
 /* Bottom drop zone for dragging to end */
@@ -342,19 +457,9 @@ input, textarea, .task-title {
 }
 
 /* Updated Task Item Layout: Drag Handle - Content - Checkbox */
+/* Hide old .task-item for table layout */
 .task-item {
-    background-color: var(--color-canvas-default);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--border-radius);
-    padding: var(--space-4);
-    cursor: grab;
-    transition: all var(--transition-fast);
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    min-height: 60px;
-    user-select: none;
+    display: none;
 }
 
 .task-item:hover {
@@ -563,39 +668,6 @@ input, textarea, .task-title {
 }
 
 /* Task Checkbox - Now at the end */
-.task-checkbox {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--color-border-default);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
-    position: relative;
-    cursor: pointer;
-}
-
-.task-checkbox:hover {
-    border-color: var(--color-accent-emphasis);
-}
-
-.task-checkbox.checked {
-    background-color: var(--color-success-emphasis);
-    border-color: var(--color-success-emphasis);
-}
-
-.task-checkbox.checked::after {
-    content: '';
-    width: 6px;
-    height: 10px;
-    border: 2px solid white;
-    border-top: none;
-    border-left: none;
-    transform: rotate(45deg);
-    margin-top: -2px;
-}
 
 /* Empty State */
 .empty-state {
@@ -616,16 +688,17 @@ input, textarea, .task-title {
 
 .empty-state p:first-of-type {
     font-weight: 600;
-    margin-bottom: var(--space-1);
-}
-
-/* Footer */
-.footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(255, 255, 255, 0.95);
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        background: rgba(3, 102, 214, 0.1);
+        color: var(--color-accent-emphasis);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        line-height: 1.4;
+        margin-left: 0;
     backdrop-filter: blur(8px);
     border-top: 1px solid var(--color-border-default);
     padding: var(--space-4);
@@ -752,55 +825,30 @@ input, textarea, .task-title {
 /* Extra small screens (iPhone SE, small Androids) */
 @media (max-width: 375px) {
     .main-content {
-        padding: 0 var(--space-2);
+        padding: 0 2px;
     }
-    
     .header, .footer {
-        padding: var(--space-2);
+        padding: 2px;
     }
-    
     .app-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
     }
-    
     .input-group {
-        gap: var(--space-1);
+        gap: 2px;
     }
-    
-    .task-input {
-        padding: 12px var(--space-2);
-        font-size: 16px;
+    .task-input, .area-input, .points-input {
+        font-size: 13px;
+        padding: 8px 4px;
     }
-    
-    .area-input {
-        width: 80px;
-        padding: 12px var(--space-1);
-        font-size: 14px;
-    }
-    
-    .points-input {
-        width: 65px;
-        padding: 12px var(--space-1);
-        font-size: 14px;
-    }
-    
     .add-button {
-        padding: 12px var(--space-2);
-        min-width: 50px;
+        padding: 8px 4px;
+        min-width: 36px;
     }
-    
-    .task-item {
-        padding: var(--space-2);
-        margin-bottom: var(--space-1);
-    }
-    
-    .task-title {
-        font-size: 0.875rem;
-    }
-    
-    .task-area, .task-points {
-        font-size: 0.7rem;
-        padding: 2px var(--space-1);
+    .task-list-table th, .task-list-table td {
+        padding: 2px 3px;
+        font-size: 11px;
+        min-width: 24px;
+        max-width: 80px;
     }
 }
 

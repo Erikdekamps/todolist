@@ -49,14 +49,7 @@
                             maxlength="200"
                             autocomplete="off"
                         >
-                        <input 
-                            type="text" 
-                            class="area-input" 
-                            id="area-input" 
-                            placeholder="Area"
-                            maxlength="50"
-                            autocomplete="off"
-                        >
+                        <!-- Area input removed -->
                         <input 
                             type="number" 
                             class="points-input" 
@@ -94,8 +87,19 @@
 
             <!-- Task list container -->
             <div class="task-list-container">
-                <div class="task-list" id="task-list">
-                    <!-- Tasks will be dynamically added here -->
+                <div class="task-list-table-wrapper">
+                    <table class="task-list-table" id="task-list-table">
+                        <thead>
+                            <tr>
+                                <th class="task-num-col">#</th>
+                                <th class="task-title-col">Task</th>
+                                <th class="task-points-col">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-list">
+                            <!-- Tasks will be dynamically added here as <tr> -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="drop-zone-bottom" id="drop-zone-bottom"></div>
                 <div class="empty-state" id="empty-state">
