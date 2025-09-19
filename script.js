@@ -330,7 +330,17 @@ class TaskListApp {
 
     createTaskRow(task, index) {
         return `
-            <tr class="${task.completed ? 'completed' : ''}" data-task-id="${task.id}" data-index="${index}">
+            <tr class="task-row ${task.completed ? 'completed' : ''}" 
+                data-task-id="${task.id}" 
+                data-index="${index}"
+                draggable="true">
+                <td class="task-drag-col">
+                    <div class="drag-handle" title="Drag to reorder">
+                        <svg viewBox="0 0 16 16" width="12" height="12">
+                            <path d="M10 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM10 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                    </div>
+                </td>
                 <td class="task-num-col">${index + 1}</td>
                 <td class="task-title-col">
                     <span class="task-title">${this.escapeHtml(task.text)}</span>
@@ -338,14 +348,32 @@ class TaskListApp {
                 <td class="task-points-col">
                     ${(task.points !== null && task.points !== undefined) ? `<span class="pill ${task.completed ? 'completed' : ''}">${task.points}</span>` : ''}
                 </td>
+                <td class="task-actions-col">
+                    <button class="delete-task-btn" title="Delete task" data-task-id="${task.id}">
+                        <svg viewBox="0 0 16 16" width="12" height="12">
+                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84L13.962 3.5H14.5a.5.5 0 0 0 0-1h-1.004a.58.58 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                        </svg>
+                    </button>
+                </td>
             </tr>
         `;
     }
 
     bindTaskTableEvents() {
         // Task row click events
-        document.querySelectorAll('.task-list-table tbody tr').forEach(row => {
+        document.querySelectorAll('.task-row').forEach(row => {
             row.addEventListener('click', this.handleTaskRowClick.bind(this));
+            
+            // Add drag and drop events
+            row.addEventListener('dragstart', this.handleDragStart.bind(this));
+            row.addEventListener('dragover', this.handleDragOver.bind(this));
+            row.addEventListener('drop', this.handleDrop.bind(this));
+            row.addEventListener('dragend', this.handleDragEnd.bind(this));
+            
+            // Add touch events for mobile drag and drop
+            row.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+            row.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+            row.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
         });
 
         // Delete button events
@@ -355,12 +383,161 @@ class TaskListApp {
     }
 
     handleTaskRowClick(e) {
-        // Don't toggle when clicking delete button
-        if (e.target.closest('.delete-task-btn')) {
+        // Don't toggle when clicking delete button or drag handle
+        if (e.target.closest('.delete-task-btn') || e.target.closest('.drag-handle')) {
             return;
         }
         const taskId = e.currentTarget.dataset.taskId;
         this.toggleTask(taskId);
+    }
+
+    handleDeleteClick(e) {
+        e.stopPropagation();
+        const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
+        this.deleteTask(taskId);
+    }
+
+    // Drag and Drop Event Handlers
+    handleDragStart(e) {
+        this.draggedElement = e.currentTarget;
+        e.currentTarget.style.opacity = '0.5';
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const targetRow = e.currentTarget;
+        
+        if (targetRow !== this.draggedElement) {
+            targetRow.style.borderTop = '2px solid var(--color-accent-emphasis)';
+        }
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        const targetRow = e.currentTarget;
+        
+        if (this.draggedElement && targetRow !== this.draggedElement) {
+            const draggedIndex = parseInt(this.draggedElement.dataset.index);
+            const targetIndex = parseInt(targetRow.dataset.index);
+            
+            // Reorder tasks array
+            this.reorderTasks(draggedIndex, targetIndex);
+        }
+        
+        // Clear visual indicators
+        this.clearDragStyles();
+    }
+
+    handleDragEnd(e) {
+        e.currentTarget.style.opacity = '';
+        this.clearDragStyles();
+        this.draggedElement = null;
+    }
+
+    clearDragStyles() {
+        document.querySelectorAll('.task-row').forEach(row => {
+            row.style.borderTop = '';
+        });
+    }
+
+    reorderTasks(fromIndex, toIndex) {
+        const taskToMove = this.tasks[fromIndex];
+        this.tasks.splice(fromIndex, 1);
+        this.tasks.splice(toIndex, 0, taskToMove);
+        
+        this.saveTasksToStorage();
+        this.renderTasks();
+        this.updateProgress();
+        this.showToast('Task order updated', 'success');
+    }
+
+    deleteTask(taskId) {
+        const taskIndex = this.tasks.findIndex(task => task.id === taskId);
+        if (taskIndex === -1) return;
+
+        const task = this.tasks[taskIndex];
+        
+        // Show confirmation dialog
+        if (confirm(`Delete task: "${task.text}"?`)) {
+            this.tasks.splice(taskIndex, 1);
+            this.saveTasksToStorage();
+            this.renderTasks();
+            this.updateProgress();
+            this.showToast('Task deleted', 'success');
+        }
+    }
+
+    // Touch Event Handlers for Mobile Drag and Drop
+    handleTouchStart(e) {
+        if (!e.target.closest('.drag-handle')) return;
+        
+        this.touchStartY = e.touches[0].clientY;
+        this.touchStartX = e.touches[0].clientX;
+        this.touchStartTime = Date.now();
+        this.draggedElement = e.currentTarget;
+        this.isDragging = false;
+        
+        // Add visual feedback
+        e.currentTarget.style.transform = 'scale(1.02)';
+        e.currentTarget.style.zIndex = '1000';
+    }
+
+    handleTouchMove(e) {
+        if (!this.draggedElement) return;
+        
+        const touch = e.touches[0];
+        const deltaY = Math.abs(touch.clientY - this.touchStartY);
+        const deltaX = Math.abs(touch.clientX - this.touchStartX);
+        
+        // Start dragging if moved enough (prevents accidental drags)
+        if (deltaY > 10 || deltaX > 10) {
+            this.isDragging = true;
+            e.preventDefault();
+            
+            // Find the row we're hovering over
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetRow = elementBelow?.closest('.task-row');
+            
+            // Clear previous drag indicators
+            this.clearDragStyles();
+            
+            if (targetRow && targetRow !== this.draggedElement) {
+                targetRow.style.borderTop = '2px solid var(--color-accent-emphasis)';
+            }
+        }
+    }
+
+    handleTouchEnd(e) {
+        if (!this.draggedElement) return;
+        
+        const touch = e.changedTouches[0];
+        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+        const targetRow = elementBelow?.closest('.task-row');
+        
+        // Reset visual feedback
+        this.draggedElement.style.transform = '';
+        this.draggedElement.style.zIndex = '';
+        
+        if (this.isDragging && targetRow && targetRow !== this.draggedElement) {
+            const draggedIndex = parseInt(this.draggedElement.dataset.index);
+            const targetIndex = parseInt(targetRow.dataset.index);
+            
+            // Reorder tasks
+            this.reorderTasks(draggedIndex, targetIndex);
+        } else if (!this.isDragging && Date.now() - this.touchStartTime < 300) {
+            // Short tap - treat as click if not dragging
+            if (!e.target.closest('.delete-task-btn')) {
+                const taskId = this.draggedElement.dataset.taskId;
+                this.toggleTask(taskId);
+            }
+        }
+        
+        this.clearDragStyles();
+        this.draggedElement = null;
+        this.isDragging = false;
     }
 
     handleCheckboxClick(e) {
@@ -372,11 +549,7 @@ class TaskListApp {
     handleDeleteClick(e) {
         e.stopPropagation();
         const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
-        
-        // Show confirmation before deleting
-        if (confirm('Are you sure you want to delete this task?')) {
-            this.deleteTask(taskId);
-        }
+        this.deleteTask(taskId);
     }
 
     // Drag and Drop Implementation

@@ -461,6 +461,117 @@ input, textarea, .task-title {
     max-width: 120px;
     text-align: center;
 }
+
+.task-list-table .task-drag-col {
+    width: 24px;
+    text-align: center;
+    padding: 2px 4px;
+}
+
+.task-list-table .task-actions-col {
+    width: 32px;
+    text-align: center;
+    padding: 2px 4px;
+}
+
+/* Drag Handle Styles */
+.drag-handle {
+    cursor: grab;
+    padding: 4px;
+    border-radius: 2px;
+    color: var(--color-fg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.drag-handle:hover {
+    background: var(--color-neutral-muted);
+    color: var(--color-fg-default);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.drag-handle svg {
+    fill: currentColor;
+}
+
+/* Delete Button Styles */
+.delete-task-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+    color: var(--color-fg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    opacity: 0;
+}
+
+.task-row:hover .delete-task-btn {
+    opacity: 1;
+}
+
+.delete-task-btn:hover {
+    background: var(--color-danger-emphasis);
+    color: white;
+}
+
+.delete-task-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-task-btn svg {
+    fill: currentColor;
+}
+
+/* Drag and Drop Styles */
+.task-row {
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.task-row:hover {
+    background: var(--color-neutral-muted);
+}
+
+.task-row.dragging {
+    opacity: 0.5;
+}
+
+.task-row.drag-over {
+    border-top: 2px solid var(--color-accent-emphasis);
+}
+
+/* Mobile Drag and Drop Adjustments */
+@media (max-width: 768px) {
+    .drag-handle {
+        padding: 8px;
+        min-height: 32px;
+        min-width: 32px;
+    }
+    
+    .delete-task-btn {
+        padding: 8px;
+        min-height: 32px;
+        min-width: 32px;
+        opacity: 1; /* Always visible on mobile */
+    }
+    
+    .task-drag-col {
+        width: 32px;
+    }
+    
+    .task-actions-col {
+        width: 40px;
+    }
+}
 /* Table header filter input styles */
 .table-filter-input {
     width: 90%;
@@ -694,41 +805,6 @@ input, textarea, .task-title {
     align-items: center;
     gap: var(--space-2);
     flex-shrink: 0;
-}
-
-.delete-task-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    color: var(--color-fg-muted);
-    opacity: 0;
-    visibility: hidden;
-}
-
-.task-item:hover .delete-task-btn {
-    opacity: 1;
-    visibility: visible;
-}
-
-.delete-task-btn:hover {
-    background: var(--color-danger-emphasis);
-    border-color: var(--color-danger-emphasis);
-    color: white;
-}
-
-.delete-task-btn:active {
-    transform: scale(0.95);
-}
-
-.delete-task-btn svg {
-    fill: currentColor;
 }
 
 /* Task Checkbox - Now at the end */
