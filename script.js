@@ -18,7 +18,7 @@ class TaskListApp {
     init() {
         this.initCacheManagement();
         this.bindEvents();
-        this.loadTasks();
+        this.loadTasksFromStorage();
         this.updateProgress();
         this.renderTasks();
     }
@@ -209,7 +209,8 @@ class TaskListApp {
             id: id || this.generateId(),
             text: text,
             completed: completed,
-            points: points // Don't default to calculateTaskPoints if points is explicitly null
+            points: points, // Don't default to calculateTaskPoints if points is explicitly null
+            area: area || ''
         };
 
         this.tasks.push(task);
@@ -821,6 +822,7 @@ class TaskListApp {
     saveTasksToStorage() {
         try {
             localStorage.setItem('taskListApp_tasks', JSON.stringify(this.tasks));
+            console.log('Tasks saved to localStorage:', this.tasks.length, 'tasks');
         } catch (error) {
             console.error('Failed to save tasks to localStorage:', error);
         }
@@ -831,6 +833,9 @@ class TaskListApp {
             const storedTasks = localStorage.getItem('taskListApp_tasks');
             if (storedTasks) {
                 this.tasks = JSON.parse(storedTasks);
+                console.log('Tasks loaded from localStorage:', this.tasks.length, 'tasks');
+            } else {
+                console.log('No tasks found in localStorage');
             }
         } catch (error) {
             console.error('Failed to load tasks from localStorage:', error);
@@ -861,15 +866,68 @@ class TaskListApp {
         reader.onload = (event) => {
             try {
                 const importedTasks = JSON.parse(event.target.result);
-                this.importTasks(importedTasks);
+                
+                // Show confirmation dialog before importing
+                const currentTaskCount = this.tasks.length;
+                const importTaskCount = Array.isArray(importedTasks) ? importedTasks.length : 0;
+                
+                const confirmMessage = currentTaskCount > 0 
+                    ? `This will replace your current ${currentTaskCount} task(s) with ${importTaskCount} task(s) from the file. This action cannot be undone.\n\nDo you want to continue?`
+                    : `Import ${importTaskCount} task(s) from the file?`;
+                
+                if (confirm(confirmMessage)) {
+                    this.importTasksOverwrite(importedTasks);
+                }
             } catch (error) {
                 console.error('Failed to parse JSON file:', error);
+                alert('Invalid JSON file format. Please check your file and try again.');
             }
         };
         reader.readAsText(file);
         
         // Reset file input
         e.target.value = '';
+    }
+
+    importTasksOverwrite(importedTasks) {
+        if (!Array.isArray(importedTasks)) {
+            console.error('Invalid task format in JSON file');
+            alert('Invalid task format in JSON file');
+            return;
+        }
+
+        // Clear existing tasks
+        this.tasks = [];
+
+        let importedCount = 0;
+        importedTasks.forEach(task => {
+            if (task.text && typeof task.text === 'string') {
+                // Create task object directly instead of using addTask
+                const newTask = {
+                    id: task.id || this.generateId(),
+                    text: task.text,
+                    completed: Boolean(task.completed),
+                    points: task.points || null,
+                    area: task.area || ''
+                };
+                
+                this.tasks.push(newTask);
+                importedCount++;
+            }
+        });
+
+        // Save to localStorage and refresh display once after all tasks are added
+        this.saveTasksToStorage();
+        this.renderTasks();
+        this.updateProgress();
+
+        if (importedCount > 0) {
+            console.log(`Successfully replaced all tasks with ${importedCount} imported task(s)!`);
+            alert(`Successfully imported ${importedCount} task(s)!`);
+        } else {
+            console.log('No valid tasks found in import file');
+            alert('No valid tasks found in the import file');
+        }
     }
 
     importTasks(importedTasks) {
