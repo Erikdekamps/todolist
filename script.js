@@ -804,12 +804,12 @@ class TaskListApp {
         // Calculate points from completed tasks (only count tasks that have points)
         const earnedPoints = this.tasks
             .filter(task => task.completed && task.points !== null && task.points !== undefined)
-            .reduce((total, task) => total + task.points, 0);
-        
+            .reduce((total, task) => total + (typeof task.points === 'number' ? task.points : Number(task.points)), 0);
+
         // Calculate total points available from all tasks (only count tasks that have points)
         const totalPoints = this.tasks
             .filter(task => task.points !== null && task.points !== undefined)
-            .reduce((total, task) => total + task.points, 0);
+            .reduce((total, task) => total + (typeof task.points === 'number' ? task.points : Number(task.points)), 0);
 
         document.getElementById('completed-count').textContent = completedTasks;
         document.getElementById('total-count').textContent = totalTasks;
@@ -907,7 +907,7 @@ class TaskListApp {
                     id: task.id || this.generateId(),
                     text: task.text,
                     completed: Boolean(task.completed),
-                    points: task.points || null,
+                    points: task.points !== undefined ? (task.points !== null ? Number(task.points) : null) : null,
                     area: task.area || ''
                 };
                 
