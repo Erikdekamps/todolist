@@ -437,9 +437,12 @@ input, textarea, .task-title {
 }
 
 .task-list-table .task-num-col {
-    width: 28px;
+    width: 48px;
+    min-width: 48px;
+    max-width: 64px;
     text-align: center;
     font-weight: 600;
+    letter-spacing: 1px;
 }
 .task-list-table .task-title-col {
     width: 100%;
@@ -451,8 +454,8 @@ input, textarea, .task-title {
     text-align: center;
 }
 .task-list-table .task-points-col {
-    width: 80px;
-    min-width: 60px;
+    width: 85px;
+    min-width: 70px;
     max-width: 120px;
     text-align: center;
 }

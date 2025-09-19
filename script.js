@@ -335,7 +335,7 @@ class TaskListApp {
                     <span class="task-title">${this.escapeHtml(task.text)}</span>
                 </td>
                 <td class="task-points-col">
-                    ${(task.points !== null && task.points !== undefined) ? `<span class="pill ${task.completed ? 'completed' : ''}">${task.points}</span>` : ''}
+                    ${(task.points !== null && task.points !== undefined) ? `<span class="pill ${task.completed ? 'completed' : ''}">${this.formatNumber(task.points)}</span>` : ''}
                 </td>
                 <td class="task-actions-col">
                     <button class="delete-task-btn" title="Delete task" data-task-id="${task.id}">
@@ -813,8 +813,8 @@ class TaskListApp {
 
         document.getElementById('completed-count').textContent = completedTasks;
         document.getElementById('total-count').textContent = totalTasks;
-        document.getElementById('points').textContent = earnedPoints;
-        document.getElementById('total-points').textContent = totalPoints;
+        document.getElementById('points').textContent = this.formatNumber(earnedPoints);
+        document.getElementById('total-points').textContent = this.formatNumber(totalPoints);
         document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
     }
 
@@ -995,6 +995,11 @@ class TaskListApp {
     // Utility Functions
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    formatNumber(num) {
+        if (num === null || num === undefined || isNaN(num)) return '';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
     escapeHtml(text) {
