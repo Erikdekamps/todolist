@@ -10,6 +10,7 @@ class TaskListApp {
         this.touchStartX = 0;
         this.touchStartTime = 0;
         this.isDragging = false;
+        this.showCompleted = true; // Track completed task visibility
         
         this.init();
     }
@@ -48,6 +49,24 @@ class TaskListApp {
         if (filterPoints) {
             filterPoints.addEventListener('input', this.handleTableFilter.bind(this));
         }
+
+        // Import/Export functionality
+        const importButton = document.getElementById('import-button');
+        const exportButton = document.getElementById('export-button');
+        const fileInput = document.getElementById('json-file-input');
+
+        importButton.addEventListener('click', () => fileInput.click());
+        exportButton.addEventListener('click', this.exportTasks.bind(this));
+        fileInput.addEventListener('change', this.handleFileImport.bind(this));
+
+        // Toggle completed tasks button
+        const toggleCompletedButton = document.getElementById('toggle-completed-button');
+        if (toggleCompletedButton) {
+            toggleCompletedButton.addEventListener('click', this.toggleCompletedVisibility.bind(this));
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
     }
 
     handleTableFilter() {
@@ -65,6 +84,25 @@ class TaskListApp {
 
             row.style.display = (areaMatch && pointsMatch) ? '' : 'none';
         });
+    }
+
+    // Toggle completed tasks visibility
+    toggleCompletedVisibility() {
+        this.showCompleted = !this.showCompleted;
+        const button = document.getElementById('toggle-completed-button');
+        
+        // Update button text while preserving the SVG
+        const svg = button.querySelector('svg');
+        button.innerHTML = '';
+        button.appendChild(svg);
+        button.appendChild(document.createTextNode(this.showCompleted ? 'Hide Completed' : 'Show Completed'));
+        
+        // Filter completed tasks
+        document.querySelectorAll('.task-list-table tbody tr.completed').forEach(row => {
+            row.style.display = this.showCompleted ? '' : 'none';
+        });
+        
+        this.showToast(this.showCompleted ? 'Showing completed tasks' : 'Hiding completed tasks', 'info');
     }
 
     // Import/Export functionality

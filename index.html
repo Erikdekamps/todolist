@@ -56,7 +56,7 @@
                             id="points-input" 
                             placeholder="Points"
                             min="1"
-                            max="100"
+                            max="1000000"
                             autocomplete="off"
                         >
                         <button type="submit" class="add-button" id="add-button">
@@ -82,6 +82,28 @@
                         </svg>
                         Export JSON
                     </button>
+                    <button class="toggle-completed-button" id="toggle-completed-button">
+                        <svg viewBox="0 0 16 16" width="16" height="16">
+                            <path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                        </svg>
+                        Hide Completed
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search bar moved above table -->
+            <div class="search-bar-above-table">
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 16 16" width="16" height="16">
+                        <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.75.75 0 0 1-1.06 1.06l-3.04-3.04zM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0z"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="search-input" 
+                        placeholder="Search tasks..."
+                        autocomplete="off"
+                    >
                 </div>
             </div>
 
@@ -112,21 +134,6 @@
             </div>
         </main>
 
-        <!-- Footer with search -->
-        <footer class="footer">
-            <div class="search-container">
-                <svg class="search-icon" viewBox="0 0 16 16" width="16" height="16">
-                    <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.75.75 0 0 1-1.06 1.06l-3.04-3.04zM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0z"/>
-                </svg>
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="search-input" 
-                    placeholder="Search tasks..."
-                    autocomplete="off"
-                >
-            </div>
-        </footer>
     </div>
 
     <!-- Loading indicator -->
