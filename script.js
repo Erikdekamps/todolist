@@ -22,6 +22,90 @@ class TaskListApp {
         this.renderTasks();
         this.updateProgress();
         this.showToast('Welcome to TaskList!', 'info');
+        this.initCacheManagement();
+    }
+
+    // Cache Management Functions
+    initCacheManagement() {
+        // Add cache clearing functionality
+        this.addCacheControls();
+        
+        // Clear browser cache on startup if development mode
+        if (this.isDevelopmentMode()) {
+            this.clearBrowserCache();
+        }
+    }
+
+    isDevelopmentMode() {
+        // Check if running in development (localhost or file://)
+        return location.hostname === 'localhost' || 
+               location.hostname === '127.0.0.1' || 
+               location.protocol === 'file:';
+    }
+
+    async clearBrowserCache() {
+        try {
+            // Clear all caches
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                await Promise.all(
+                    cacheNames.map(cacheName => caches.delete(cacheName))
+                );
+                console.log('All caches cleared');
+            }
+
+            // Force reload with cache bypass
+            if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+                setTimeout(() => {
+                    location.reload(true);
+                }, 100);
+            }
+        } catch (error) {
+            console.warn('Cache clearing failed:', error);
+        }
+    }
+
+    addCacheControls() {
+        // Add keyboard shortcut for cache clearing (Ctrl+Shift+R)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                this.clearBrowserCache();
+                this.showToast('Cache cleared and page reloaded', 'success');
+            }
+        });
+
+        // Add cache clear button in development mode
+        if (this.isDevelopmentMode()) {
+            this.addDevCacheButton();
+        }
+    }
+
+    addDevCacheButton() {
+        const header = document.querySelector('.header');
+        if (header) {
+            const cacheButton = document.createElement('button');
+            cacheButton.textContent = '🗑️ Clear Cache';
+            cacheButton.className = 'dev-cache-button';
+            cacheButton.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                background: rgba(255, 0, 0, 0.8);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 10px;
+                cursor: pointer;
+                z-index: 1000;
+            `;
+            cacheButton.addEventListener('click', () => {
+                this.clearBrowserCache();
+                this.showToast('Cache cleared!', 'success');
+            });
+            header.appendChild(cacheButton);
+        }
     }
 
     // Migration function to add points to existing tasks (disabled - now supporting tasks without points)
@@ -744,6 +828,59 @@ class TaskListApp {
     hideLoading() {
         document.getElementById('loading-indicator').classList.remove('visible');
     }
+
+    // Additional Cache Control Methods
+    async disableServiceWorkerCache() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                }
+                console.log('Service worker unregistered');
+                this.showToast('Service Worker cache disabled', 'info');
+            } catch (error) {
+                console.error('Failed to unregister service worker:', error);
+            }
+        }
+    }
+
+    setNoCacheHeaders() {
+        // Add no-cache meta tags if they don't exist
+        const head = document.head;
+        
+        const metaTags = [
+            { 'http-equiv': 'Cache-Control', content: 'no-cache, no-store, must-revalidate' },
+            { 'http-equiv': 'Pragma', content: 'no-cache' },
+            { 'http-equiv': 'Expires', content: '0' }
+        ];
+
+        metaTags.forEach(tagData => {
+            const existing = head.querySelector(`meta[http-equiv="${tagData['http-equiv']}"]`);
+            if (!existing) {
+                const meta = document.createElement('meta');
+                Object.keys(tagData).forEach(attr => {
+                    meta.setAttribute(attr, tagData[attr]);
+                });
+                head.appendChild(meta);
+            }
+        });
+    }
+
+    // Development helper to force refresh all resources
+    forceRefreshResources() {
+        const timestamp = Date.now();
+        
+        // Refresh CSS
+        const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
+        cssLinks.forEach(link => {
+            const href = link.href.split('?')[0];
+            link.href = `${href}?v=${timestamp}`;
+        });
+
+        // Refresh scripts would require page reload
+        setTimeout(() => location.reload(true), 100);
+    }
 }
 
 // Initialize the app when DOM is loaded
@@ -754,12 +891,46 @@ document.addEventListener('DOMContentLoaded', () => {
 // Service Worker registration for PWA capabilities
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
+        // Check if caching should be disabled
+        const disableCache = localStorage.getItem('disableCache') === 'true' || 
+                           location.hostname === 'localhost' || 
+                           location.hostname === '127.0.0.1';
+
+        if (disableCache) {
+            // Unregister any existing service workers
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (const registration of registrations) {
+                    registration.unregister();
+                }
             });
+            console.log('Service Worker caching disabled');
+        } else {
+            // Register service worker normally
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('SW registered: ', registration);
+                    
+                    // Force update on page load in development
+                    if (location.hostname === 'localhost') {
+                        registration.update();
+                    }
+                })
+                .catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        }
     });
 }
+
+// Add global cache control functions
+window.disableCache = () => {
+    localStorage.setItem('disableCache', 'true');
+    if (window.taskListApp) {
+        window.taskListApp.clearBrowserCache();
+    }
+};
+
+window.enableCache = () => {
+    localStorage.removeItem('disableCache');
+    location.reload();
+};

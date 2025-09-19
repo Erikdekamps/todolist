@@ -1167,3 +1167,23 @@ input, textarea, .task-title {
         background-color: rgba(13, 17, 23, 0.95);
     }
 }
+
+/* Development Cache Control Button */
+.dev-cache-button {
+    position: absolute !important;
+    top: 5px !important;
+    right: 5px !important;
+    padding: 4px 8px !important;
+    background: rgba(255, 0, 0, 0.8) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 10px !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+    font-family: monospace !important;
+}
+
+.dev-cache-button:hover {
+    background: rgba(255, 0, 0, 1) !important;
+}
