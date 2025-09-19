@@ -16,13 +16,11 @@ class TaskListApp {
     }
 
     init() {
-        this.loadTasksFromStorage();
-        this.migrateTasks(); // Ensure all tasks have points
-        this.bindEvents();
-        this.renderTasks();
-        this.updateProgress();
-        this.showToast('Welcome to TaskList!', 'info');
         this.initCacheManagement();
+        this.bindEvents();
+        this.loadTasks();
+        this.updateProgress();
+        this.renderTasks();
     }
 
     // Cache Management Functions
@@ -71,7 +69,7 @@ class TaskListApp {
             if (e.ctrlKey && e.shiftKey && e.key === 'R') {
                 e.preventDefault();
                 this.clearBrowserCache();
-                this.showToast('Cache cleared and page reloaded', 'success');
+                console.log('Cache cleared and page will reload');
             }
         });
 
@@ -102,7 +100,7 @@ class TaskListApp {
             `;
             cacheButton.addEventListener('click', () => {
                 this.clearBrowserCache();
-                this.showToast('Cache cleared!', 'success');
+                console.log('Cache cleared!');
             });
             header.appendChild(cacheButton);
         }
@@ -185,8 +183,6 @@ class TaskListApp {
         document.querySelectorAll('.task-list-table tbody tr.completed').forEach(row => {
             row.style.display = this.showCompleted ? '' : 'none';
         });
-        
-        this.showToast(this.showCompleted ? 'Showing completed tasks' : 'Hiding completed tasks', 'info');
     }
 
     // Import/Export functionality
@@ -220,10 +216,6 @@ class TaskListApp {
         this.saveTasksToStorage();
         this.renderTasks();
         this.updateProgress();
-
-        if (!id) {
-            this.showToast('Task added successfully!', 'success');
-        }
     }
 
     calculateTaskPoints(text) {
@@ -250,9 +242,6 @@ class TaskListApp {
             this.saveTasksToStorage();
             this.renderTasks();
             this.updateProgress();
-            
-            const message = task.completed ? 'Task completed! 🎉' : 'Task reopened';
-            this.showToast(message, task.completed ? 'success' : 'info');
         }
     }
 
@@ -263,7 +252,6 @@ class TaskListApp {
             this.saveTasksToStorage();
             this.renderTasks();
             this.updateProgress();
-            this.showToast('Task deleted', 'info');
         }
     }
 
@@ -451,7 +439,6 @@ class TaskListApp {
         this.saveTasksToStorage();
         this.renderTasks();
         this.updateProgress();
-        this.showToast('Task order updated', 'success');
     }
 
     deleteTask(taskId) {
@@ -466,7 +453,6 @@ class TaskListApp {
             this.saveTasksToStorage();
             this.renderTasks();
             this.updateProgress();
-            this.showToast('Task deleted', 'success');
         }
     }
 
@@ -837,7 +823,6 @@ class TaskListApp {
             localStorage.setItem('taskListApp_tasks', JSON.stringify(this.tasks));
         } catch (error) {
             console.error('Failed to save tasks to localStorage:', error);
-            this.showToast('Failed to save tasks', 'error');
         }
     }
 
@@ -849,7 +834,6 @@ class TaskListApp {
             }
         } catch (error) {
             console.error('Failed to load tasks from localStorage:', error);
-            this.showToast('Failed to load tasks', 'error');
             this.tasks = [];
         }
     }
@@ -867,8 +851,6 @@ class TaskListApp {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
-        this.showToast('Tasks exported successfully!', 'success');
     }
 
     handleFileImport(e) {
@@ -882,7 +864,6 @@ class TaskListApp {
                 this.importTasks(importedTasks);
             } catch (error) {
                 console.error('Failed to parse JSON file:', error);
-                this.showToast('Invalid JSON file format', 'error');
             }
         };
         reader.readAsText(file);
@@ -893,7 +874,7 @@ class TaskListApp {
 
     importTasks(importedTasks) {
         if (!Array.isArray(importedTasks)) {
-            this.showToast('Invalid task format in JSON file', 'error');
+            console.error('Invalid task format in JSON file');
             return;
         }
 
@@ -918,9 +899,9 @@ class TaskListApp {
         });
 
         if (importedCount > 0) {
-            this.showToast(`Imported ${importedCount} tasks successfully!`, 'success');
+            console.log(`Imported ${importedCount} tasks successfully!`);
         } else {
-            this.showToast('No new tasks to import', 'info');
+            console.log('No new tasks to import');
         }
     }
 
@@ -967,30 +948,6 @@ class TaskListApp {
     toggleEmptyState(show) {
         const emptyState = document.getElementById('empty-state');
         emptyState.classList.toggle('visible', show);
-    }
-
-    // Toast Notifications
-    showToast(message, type = 'info', duration = 3000) {
-        const toastContainer = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        
-        toastContainer.appendChild(toast);
-        
-        // Auto remove toast
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, duration);
-        
-        // Make toast clickable to dismiss
-        toast.addEventListener('click', () => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        });
     }
 
     // Loading Indicator
