@@ -137,9 +137,8 @@ input, textarea, .task-title {
 
 /* Header Styles */
 .header {
-    padding: var(--space-2) var(--space-3);
-    /* Add safe area top padding */
-    padding-top: calc(var(--space-2) + env(safe-area-inset-top));
+    padding: calc(var(--space-2) + env(safe-area-inset-top)) var(--space-4) var(--space-2) var(--space-4);
+    /* Cleaned up: more balanced vertical and horizontal padding, safe area included at top */
     position: sticky;
     top: 0;
     z-index: 100;
@@ -150,6 +149,8 @@ input, textarea, .task-title {
     font-weight: 700;
     color: var(--color-fg-default);
     margin: 0;
+    padding: 0;
+    /* Remove extra padding from title, keep it tight */
 }
 
 .reset-storage-btn {
@@ -225,9 +226,6 @@ input, textarea, .task-title {
     flex-shrink: 0;
 }
 
-.task-form {
-    margin-bottom: var(--space-2);
-}
 
 .input-group {
     display: flex;
@@ -372,7 +370,7 @@ input, textarea, .task-title {
 
 /* Search bar above table */
 .search-bar-above-table {
-    padding: var(--space-3) 0;
+    padding: var(--space-2) 0;
     border-bottom: 1px solid var(--color-border-muted);
     flex-shrink: 0;
 }
