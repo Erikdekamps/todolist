@@ -26,9 +26,15 @@
     <div class="app-container">
         <!-- Header with title and progress -->
         <header class="header">
-            <h1 class="app-title">
-                Todo list
-            </h1>
+            <div class="header-flex">
+                <h1 class="app-title">Todo list</h1>
+                <button class="reset-storage-btn" id="reset-storage-btn" title="Reset all tasks">
+                    <svg viewBox="0 0 16 16" width="14" height="14">
+                        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <!-- Main content area -->
@@ -154,6 +160,23 @@
     <!-- Loading indicator -->
     <div class="loading-indicator" id="loading-indicator">
         <div class="spinner"></div>
+    </div>
+
+    <!-- Custom confirmation modal -->
+    <div class="confirmation-modal" id="confirmation-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirm Action</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="modal-cancel">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <script>

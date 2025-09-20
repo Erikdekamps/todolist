@@ -160,6 +160,21 @@ class TaskListApp {
             toggleCompletedButton.addEventListener('click', this.toggleCompletedVisibility.bind(this));
         }
 
+        // Reset storage button
+        const resetStorageBtn = document.getElementById('reset-storage-btn');
+        console.log('Reset button found:', resetStorageBtn);
+        if (resetStorageBtn) {
+            console.log('Binding reset storage event listener');
+            resetStorageBtn.addEventListener('click', this.handleResetStorage.bind(this));
+            
+            // Test if button is clickable
+            resetStorageBtn.addEventListener('mousedown', () => {
+                console.log('Reset button mousedown detected');
+            });
+        } else {
+            console.error('Reset storage button not found in DOM');
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
     }
@@ -196,6 +211,82 @@ class TaskListApp {
         document.querySelectorAll('.task-list-table tbody tr.completed').forEach(row => {
             row.style.display = this.showCompleted ? '' : 'none';
         });
+    }
+
+    // Reset storage functionality
+    handleResetStorage() {
+        console.log('handleResetStorage called!');
+        
+        const taskCount = this.tasks.length;
+        console.log('Current task count:', taskCount);
+        
+        const title = 'Reset All Tasks';
+        const message = taskCount > 0 
+            ? `Are you sure you want to delete all ${taskCount} tasks?\n\nThis action cannot be undone.`
+            : 'Reset local storage? This will clear any saved data.';
+        
+        console.log('Showing custom confirmation modal');
+        
+        this.showConfirmationModal(title, message, () => {
+            console.log('User confirmed reset');
+            localStorage.removeItem('taskListApp_tasks');
+            this.tasks = [];
+            this.renderTasks();
+            this.updateProgress();
+            console.log('Local storage reset successfully');
+        });
+    }
+
+    // Custom confirmation modal
+    showConfirmationModal(title, message, onConfirm) {
+        const modal = document.getElementById('confirmation-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+        const overlay = modal.querySelector('.modal-overlay');
+        
+        // Set content
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        
+        // Show modal
+        modal.classList.add('visible');
+        
+        // Handle confirm
+        const handleConfirm = () => {
+            modal.classList.remove('visible');
+            onConfirm();
+            cleanup();
+        };
+        
+        // Handle cancel
+        const handleCancel = () => {
+            modal.classList.remove('visible');
+            console.log('User cancelled action');
+            cleanup();
+        };
+        
+        // Cleanup event listeners
+        const cleanup = () => {
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            overlay.removeEventListener('click', handleCancel);
+            document.removeEventListener('keydown', handleEscape);
+        };
+        
+        // Handle escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                handleCancel();
+            }
+        };
+        
+        // Add event listeners
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+        overlay.addEventListener('click', handleCancel);
+        document.addEventListener('keydown', handleEscape);
     }
 
     // Import/Export functionality
