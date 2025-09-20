@@ -467,7 +467,8 @@ input, textarea, .task-title {
 }
 
 .task-list-table .task-actions-col {
-    width: 32px;
+    width: 40px;
+    min-width: 32px;
     text-align: center;
     padding: 2px 4px;
 }
@@ -509,7 +510,9 @@ input, textarea, .task-title {
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
-    opacity: 0;
+    opacity: 0.6;
+    min-width: 24px;
+    min-height: 24px;
 }
 
 .task-row:hover .delete-task-btn {
@@ -519,6 +522,8 @@ input, textarea, .task-title {
 .delete-task-btn:hover {
     background: var(--color-danger-emphasis);
     color: white;
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 .delete-task-btn:active {
@@ -527,6 +532,8 @@ input, textarea, .task-title {
 
 .delete-task-btn svg {
     fill: currentColor;
+    width: 12px;
+    height: 12px;
 }
 
 /* Drag and Drop Styles */
