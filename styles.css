@@ -841,13 +841,13 @@ input, textarea, .task-title {
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: var(--space-6);
+    padding: var(--space-6) var(--space-4);
     color: var(--color-fg-muted);
     display: none;
     background: linear-gradient(135deg, var(--color-canvas-subtle) 0%, #1e1e1e 100%);
     border-radius: var(--border-radius-medium);
     border: 2px dashed var(--color-border-muted);
-    margin: var(--space-4);
+    margin: var(--space-2) 0;
     box-shadow: var(--shadow-small);
 }
 
