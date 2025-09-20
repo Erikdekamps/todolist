@@ -16,6 +16,19 @@ class TaskListApp {
     }
 
     init() {
+        // Log browser information for debugging
+        console.log('TaskListApp initializing with browser info:', {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            cookieEnabled: navigator.cookieEnabled,
+            language: navigator.language,
+            onLine: navigator.onLine,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            }
+        });
+        
         this.initCacheManagement();
         this.bindEvents();
         this.loadTasksFromStorage();
@@ -365,9 +378,18 @@ class TaskListApp {
             row.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
         });
 
-        // Delete button events
-        document.querySelectorAll('.delete-task-btn').forEach(deleteBtn => {
+        // Delete button events with cross-browser support
+        document.querySelectorAll('.delete-task-btn').forEach((deleteBtn, index) => {
+            console.log(`Binding delete event ${index + 1} to button with taskId:`, deleteBtn.dataset.taskId);
+            
+            // Remove any existing event listeners to prevent duplicates
+            deleteBtn.removeEventListener('click', this.handleDeleteClick);
+            
+            // Primary click event
             deleteBtn.addEventListener('click', this.handleDeleteClick.bind(this));
+            
+            // Remove onclick to prevent double execution
+            deleteBtn.onclick = null;
         });
     }
 
@@ -381,9 +403,37 @@ class TaskListApp {
     }
 
     handleDeleteClick(e) {
+        console.log('Delete button clicked!', {
+            target: e.target,
+            targetTagName: e.target.tagName,
+            targetClassName: e.target.className,
+            currentTarget: e.currentTarget,
+            button: e.target.closest('.delete-task-btn'),
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        });
+        
         e.stopPropagation();
-        const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
-        this.deleteTask(taskId);
+        e.preventDefault();
+        
+        // Get the button element regardless of whether clicked element is the button or SVG
+        const deleteButton = e.target.closest('.delete-task-btn');
+        console.log('Delete button found:', deleteButton);
+        
+        if (!deleteButton) {
+            console.error('No delete button found in event target hierarchy');
+            return;
+        }
+        
+        const taskId = deleteButton.dataset.taskId;
+        console.log('Task ID from button:', taskId);
+        
+        if (taskId) {
+            console.log('Calling deleteTask with ID:', taskId);
+            this.deleteTask(taskId);
+        } else {
+            console.error('No task ID found on delete button');
+        }
     }
 
     // Drag and Drop Event Handlers
@@ -443,18 +493,26 @@ class TaskListApp {
     }
 
     deleteTask(taskId) {
+        console.log('deleteTask called with ID:', taskId);
+        
         const taskIndex = this.tasks.findIndex(task => task.id === taskId);
-        if (taskIndex === -1) return;
+        console.log('Task index found:', taskIndex);
+        
+        if (taskIndex === -1) {
+            console.error('Task not found with ID:', taskId);
+            return;
+        }
 
         const task = this.tasks[taskIndex];
+        console.log('Task to delete:', task);
         
-        // Show confirmation dialog
-        if (confirm(`Delete task: "${task.text}"?`)) {
-            this.tasks.splice(taskIndex, 1);
-            this.saveTasksToStorage();
-            this.renderTasks();
-            this.updateProgress();
-        }
+        // Delete immediately without confirmation
+        console.log('Deleting task at index:', taskIndex);
+        this.tasks.splice(taskIndex, 1);
+        this.saveTasksToStorage();
+        this.renderTasks();
+        this.updateProgress();
+        console.log('Task deleted successfully, remaining tasks:', this.tasks.length);
     }
 
     // Touch Event Handlers for Mobile Drag and Drop
@@ -531,12 +589,6 @@ class TaskListApp {
         e.stopPropagation();
         const taskId = e.target.dataset.taskId;
         this.toggleTask(taskId);
-    }
-
-    handleDeleteClick(e) {
-        e.stopPropagation();
-        const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
-        this.deleteTask(taskId);
     }
 
     // Drag and Drop Implementation
@@ -1073,6 +1125,29 @@ class TaskListApp {
 
         // Refresh scripts would require page reload
         setTimeout(() => location.reload(true), 100);
+    }
+
+    // Debug helper to test delete functionality
+    testDeleteButton() {
+        console.log('Testing delete button functionality...');
+        const deleteButtons = document.querySelectorAll('.delete-task-btn');
+        console.log(`Found ${deleteButtons.length} delete buttons`);
+        
+        deleteButtons.forEach((btn, index) => {
+            console.log(`Button ${index + 1}:`, {
+                element: btn,
+                taskId: btn.dataset.taskId,
+                visible: btn.offsetParent !== null,
+                clickable: !btn.disabled,
+                styles: window.getComputedStyle(btn)
+            });
+        });
+        
+        if (deleteButtons.length > 0) {
+            console.log('You can test clicking a delete button by running: document.querySelector(".delete-task-btn").click()');
+        }
+        
+        return deleteButtons;
     }
 }
 

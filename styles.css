@@ -534,6 +534,7 @@ input, textarea, .task-title {
     fill: currentColor;
     width: 12px;
     height: 12px;
+    pointer-events: none;
 }
 
 /* Drag and Drop Styles */
