@@ -885,6 +885,12 @@ input, textarea, .task-title {
     position: relative;
 }
 
+.footer .import-export-controls {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-muted);
+}
+
 .footer .progress-points {
     font-weight: 600;
     color: var(--color-success-fg);
